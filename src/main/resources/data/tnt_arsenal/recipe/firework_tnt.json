@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:firework_rocket"
+  ],
+  "result": {
+    "id": "tnt_arsenal:firework_tnt",
+    "count": 1
+  }
+}

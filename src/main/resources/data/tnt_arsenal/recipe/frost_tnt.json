@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:packed_ice",
+    "minecraft:snowball"
+  ],
+  "result": {
+    "id": "tnt_arsenal:frost_tnt",
+    "count": 1
+  }
+}

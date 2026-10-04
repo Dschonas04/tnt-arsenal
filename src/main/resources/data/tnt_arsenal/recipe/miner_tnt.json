@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:stone_pickaxe",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "tnt_arsenal:miner_tnt",
+    "count": 1
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:iron_block"
+  ],
+  "result": {
+    "id": "tnt_arsenal:gravity_tnt",
+    "count": 1
+  }
+}

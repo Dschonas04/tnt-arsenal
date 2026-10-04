@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:slime_ball"
+  ],
+  "result": {
+    "id": "tnt_arsenal:bounce_tnt",
+    "count": 1
+  }
+}

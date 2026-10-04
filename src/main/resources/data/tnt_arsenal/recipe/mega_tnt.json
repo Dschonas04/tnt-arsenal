@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:tnt",
+    "minecraft:tnt",
+    "minecraft:tnt"
+  ],
+  "result": {
+    "id": "tnt_arsenal:mega_tnt",
+    "count": 1
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:iron_shovel"
+  ],
+  "result": {
+    "id": "tnt_arsenal:leveler_tnt",
+    "count": 1
+  }
+}

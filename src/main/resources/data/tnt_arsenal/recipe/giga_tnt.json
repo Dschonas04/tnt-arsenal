@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "tnt_arsenal:mega_tnt",
+    "tnt_arsenal:mega_tnt",
+    "tnt_arsenal:mega_tnt",
+    "tnt_arsenal:mega_tnt",
+    "minecraft:blaze_powder"
+  ],
+  "result": {
+    "id": "tnt_arsenal:giga_tnt",
+    "count": 1
+  }
+}

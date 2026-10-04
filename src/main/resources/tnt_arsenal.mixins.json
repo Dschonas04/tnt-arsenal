@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "io.github.dschonas04.tntarsenal.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["PrimedTntMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

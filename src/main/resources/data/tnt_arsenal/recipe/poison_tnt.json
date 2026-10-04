@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:fermented_spider_eye"
+  ],
+  "result": {
+    "id": "tnt_arsenal:poison_tnt",
+    "count": 1
+  }
+}

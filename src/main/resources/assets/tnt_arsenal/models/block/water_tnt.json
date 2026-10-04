@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "tnt_arsenal:block/water_tnt_top",
+    "bottom": "tnt_arsenal:block/water_tnt_bottom",
+    "side": "tnt_arsenal:block/water_tnt_side"
+  }
+}

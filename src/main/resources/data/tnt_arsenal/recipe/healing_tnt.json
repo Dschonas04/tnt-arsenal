@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:glistering_melon_slice"
+  ],
+  "result": {
+    "id": "tnt_arsenal:healing_tnt",
+    "count": 1
+  }
+}

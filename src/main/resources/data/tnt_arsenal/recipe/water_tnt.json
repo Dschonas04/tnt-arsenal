@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "tnt_arsenal:water_tnt",
+    "count": 1
+  }
+}

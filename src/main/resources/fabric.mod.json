@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "tnt_arsenal",
+  "version": "${version}",
+  "name": "TNT Arsenal",
+  "description": "Nineteen kinds of TNT, each with its own look and its own way of going off: Mega, Giga and Nuke, fire, lightning, cluster, drill, tunnel, leveler, miner, water, lava, frost, poison, gravity, ender, bounce, firework and healing. Crafted at the table, so JEI and REI show every recipe.",
+  "authors": ["Dschonas04"],
+  "contact": {
+    "homepage": "https://github.com/Dschonas04/tnt-arsenal",
+    "sources": "https://github.com/Dschonas04/tnt-arsenal",
+    "issues": "https://github.com/Dschonas04/tnt-arsenal/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/tnt_arsenal/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["io.github.dschonas04.tntarsenal.TntArsenal"]
+  },
+  "mixins": ["tnt_arsenal.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "fabric-api": "*",
+    "minecraft": ">=26.2",
+    "java": ">=21"
+  }
+}
