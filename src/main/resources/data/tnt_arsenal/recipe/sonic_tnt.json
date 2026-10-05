@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:echo_shard"
+  ],
+  "result": {
+    "id": "tnt_arsenal:sonic_tnt",
+    "count": 1
+  }
+}

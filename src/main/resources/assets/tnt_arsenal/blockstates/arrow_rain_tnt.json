@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "tnt_arsenal:block/arrow_rain_tnt"
+      }
+    }
+  ]
+}

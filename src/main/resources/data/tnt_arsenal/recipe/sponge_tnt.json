@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:sponge"
+  ],
+  "result": {
+    "id": "tnt_arsenal:sponge_tnt",
+    "count": 1
+  }
+}

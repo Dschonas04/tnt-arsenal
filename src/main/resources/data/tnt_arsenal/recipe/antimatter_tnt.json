@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:dragon_breath",
+    "minecraft:ender_eye"
+  ],
+  "result": {
+    "id": "tnt_arsenal:antimatter_tnt",
+    "count": 1
+  }
+}

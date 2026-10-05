@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:phantom_membrane",
+    "minecraft:feather"
+  ],
+  "result": {
+    "id": "tnt_arsenal:antigravity_tnt",
+    "count": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "tnt_arsenal:gravity_tnt",
+    "minecraft:ender_eye",
+    "minecraft:crying_obsidian"
+  ],
+  "result": {
+    "id": "tnt_arsenal:black_hole_tnt",
+    "count": 1
+  }
+}

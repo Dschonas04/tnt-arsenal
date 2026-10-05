@@ -1,35 +1,76 @@
 # TNT Arsenal
 
-Nineteen kinds of TNT for Minecraft 26.2 (Fabric), each with its own look and its
-own way of going off. They are crafted at an ordinary crafting table, so **JEI and
-REI show every recipe**.
+Forty-two kinds of TNT for Minecraft 26.2 (Fabric), each with its own hand-drawn
+look and its own way of going off. They are crafted at an ordinary crafting table,
+so **JEI and REI show every recipe**.
 
-![The nineteen kinds, side and top](docs/textures.png)
+![All forty-two kinds](docs/textures.png)
 
 | Kind | What it does | Recipe (shapeless) |
 |---|---|---|
 | Mega TNT | twice the power of TNT | 4 × TNT |
-| Giga TNT | four times the power | 4 × Mega TNT + blaze powder |
-| Nuke TNT | six times the power, sets fire | 4 × Giga TNT + nether star |
-| Fire TNT | normal blast, sets everything around alight | TNT + fire charge |
-| Lightning TNT | a ring of nine lightning bolts | TNT + lightning rod |
-| Cluster TNT | bursts and flings eight TNT in all directions | 3 × TNT + 2 × gunpowder |
-| Drill TNT | blows a shaft 36 blocks straight down | TNT + iron pickaxe |
-| Tunnel TNT | blows a 42-block tunnel the way you faced when placing it | 2 × TNT + rail |
-| Leveler TNT | clears a round plot, radius 8, twelve blocks high, nothing below | TNT + iron shovel |
-| Miner TNT | removes stone, dirt and gravel around it, leaves the ores | TNT + stone pickaxe + redstone |
-| Water TNT | explodes and floods the crater | TNT + water bucket |
-| Lava TNT | explodes and fills the crater with lava | TNT + lava bucket |
-| Frost TNT | freezes water and lava, drops snow, chills creatures | TNT + packed ice + snowball |
-| Poison TNT | small bang, then a cloud of poison | TNT + fermented spider eye |
-| Gravity TNT | pulls everything within 16 blocks in, then explodes | TNT + iron block |
-| Ender TNT | teleports every creature nearby somewhere else | TNT + ender pearl |
-| Bounce TNT | launches everything into the air, breaks nothing | TNT + slime ball |
-| Firework TNT | all show, no damage | TNT + firework rocket |
-| Healing TNT | a cloud that heals, breaks nothing | TNT + glistering melon slice |
+| Giga TNT | four times the power of TNT | 4 × Mega TNT + blaze powder |
+| Nuke TNT | a huge round crater, fire and a mushroom cloud | 4 × Giga TNT + nether star |
+| Fire TNT | sets everything around alight | TNT + fire charge |
+| Lightning TNT | a ring of lightning | TNT + lightning rod |
+| Cluster TNT | bursts into eight TNT | 3 × TNT + 2 × gunpowder |
+| Drill TNT | a clean 3×3 shaft up to 64 deep, with a ladder | TNT + iron pickaxe |
+| Tunnel TNT | a clean 3×3 tunnel, 48 long, with torches | 2 × TNT + rail |
+| Leveler TNT | clears a plot: radius 10, 16 high | TNT + iron shovel |
+| Miner TNT | removes stone and dirt, leaves the ores | TNT + stone pickaxe + redstone |
+| Water TNT | floods its crater | TNT + water bucket |
+| Lava TNT | fills its crater with lava | TNT + lava bucket |
+| Frost TNT | freezes water, lava and creatures | TNT + packed ice + snowball |
+| Poison TNT | leaves a cloud of poison | TNT + fermented spider eye |
+| Gravity TNT | pulls everything in for two seconds, then bang | TNT + iron block |
+| Ender TNT | scatters everyone nearby | TNT + ender pearl |
+| Bounce TNT | launches everything into the air, soft landing | TNT + slime ball |
+| Firework TNT | real fireworks, no damage | TNT + firework rocket |
+| Healing TNT | heals and cures poison and wither | TNT + glistering melon slice |
+| Black Hole TNT | swallows everything for five seconds, then the blocks | Gravity TNT + ender eye + crying obsidian |
+| Antigravity TNT | blocks and creatures float up | TNT + phantom membrane + feather |
+| Bridge TNT | builds a 40-block stone bridge the way you face | TNT + 4 × stone bricks |
+| Wall TNT | raises a round castle wall | TNT + 2 × cobblestone wall |
+| Horde TNT | summons zombies and skeletons | TNT + 2 × rotten flesh + bone |
+| Sonic TNT | the warden's sonic boom, through walls | TNT + echo shard |
+| Smoke TNT | a smoke screen: blindness and slowness | TNT + campfire |
+| X-Ray TNT | stone turns to glass for 30 seconds, ores show | TNT + 2 × glass |
+| Nature TNT | bone meal for everything around | TNT + 3 × bone meal |
+| Antimatter TNT | erases a ball of blocks without a trace | TNT + dragon breath + ender eye |
+| Nether TNT | turns the land around into the Nether | TNT + netherrack + blaze powder |
+| Meteor TNT | six burning meteors fall from the sky | 2 × TNT + magma block + fire charge |
+| Arrow Rain TNT | arrows rain down from the sky | TNT + 4 × arrow |
+| Cobweb TNT | spins cobwebs into the air | TNT + 3 × string |
+| Storm TNT | eight seconds of storm, twenty lightning strikes | Lightning TNT + 2 × lightning rod |
+| Magnet TNT | pulls all items and XP within 40 blocks | TNT + 2 × iron ingot + redstone |
+| Sponge TNT | soaks up water and lava within 10 blocks | TNT + sponge |
+| Torch TNT | places torches wherever it is dark | TNT + 4 × torch |
+| Shockwave TNT | a blast wave: throws everything away, shatters glass | TNT + piston |
+| Dome TNT | builds a glass dome for shelter | TNT + 4 × glass pane |
+| Chain Reaction TNT | lights every TNT within 16 blocks | 2 × TNT + redstone torch |
+| Lumber TNT | fells every tree around, wood in one pile | TNT + iron axe |
+| Harvest TNT | harvests ripe fields and replants them | TNT + iron hoe |
 
 They light like TNT: redstone, flint and steel, fire charges, burning arrows and
-other explosions. While the fuse burns they keep their own texture.
+other explosions. While the fuse burns they keep their own texture. Kinds that
+build or dig — drill, tunnel and bridge — go the way the player
+faced when placing the block.
+
+## What is never touched
+
+Kinds that remove or swap blocks directly (leveler, miner, x-ray, antimatter,
+black hole, nether, lumber, drill, tunnel and the rest) never touch:
+
+- **bedrock** or anything else unbreakable,
+- **obsidian-hard blocks** — anything an explosion could not break either:
+  obsidian, crying obsidian, ancient debris, netherite, anvils, reinforced deepslate,
+- **blocks with contents** — chests, barrels, furnaces, spawners, signs,
+- other TNT, which goes off instead of vanishing.
+
+The big explosions (Giga, Nuke) use block-explosion rules, so only a share of
+the broken blocks drops and a crater does not bury the server in items. Long
+detonations (tunnel, drill, leveler, dome, wall, bridge, black hole) spread their
+work over several ticks instead of stalling one, and never load chunks.
 
 ## Install
 
@@ -51,10 +92,21 @@ Two Fabric API modules (`fabric-api-base`, `fabric-creative-tab-api-v1`) go into
 
 Each kind is an ordinary `TntBlock` subclass. When it primes, the primed entity
 carries the block's state — vanilla renders it with that texture, so the mod needs
-no client code. A single mixin on `PrimedTnt#explode` hands the detonation to the
-kind whose block the entity carries; every other TNT explodes as before.
+no client code. A mixin on `PrimedTnt#explode` hands the detonation to the kind
+whose block the entity carries; every other TNT explodes as before. A second mixin
+on the server tick drives detonations that play out over time.
 
-All textures are original pixel art made for this mod.
+## Textures
+
+All textures are original 16×16 pixel art, generated by `tools/textures.py`
+(plain Python, no image library): bundled sticks with a paper label, every kind
+with its own stick material, strap, label colour, emblem and surface pattern,
+shaded along hue-shifted ramps. The same script writes the models, translations,
+recipes, the mod icon and the preview sheet above.
+
+```
+python3 tools/textures.py
+```
 
 ## License
 

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:cobblestone_wall",
+    "minecraft:cobblestone_wall"
+  ],
+  "result": {
+    "id": "tnt_arsenal:wall_tnt",
+    "count": 1
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "tnt_arsenal:lightning_tnt",
+    "minecraft:lightning_rod",
+    "minecraft:lightning_rod"
+  ],
+  "result": {
+    "id": "tnt_arsenal:storm_tnt",
+    "count": 1
+  }
+}

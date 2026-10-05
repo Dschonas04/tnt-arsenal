@@ -9,7 +9,7 @@ import net.minecraft.world.entity.item.PrimedTnt;
  */
 public enum Kind {
     MEGA("mega_tnt", 80, (l, t) -> Detonations.blast(l, t, 8, false)),
-    GIGA("giga_tnt", 100, (l, t) -> Detonations.blast(l, t, 16, false)),
+    GIGA("giga_tnt", 100, Detonations::giga),
     NUKE("nuke_tnt", 160, Detonations::nuke),
     FIRE("fire_tnt", 80, Detonations::fire),
     LIGHTNING("lightning_tnt", 80, Detonations::lightning),
@@ -26,7 +26,30 @@ public enum Kind {
     ENDER("ender_tnt", 60, Detonations::ender),
     BOUNCE("bounce_tnt", 40, Detonations::bounce),
     FIREWORK("firework_tnt", 40, Detonations::firework),
-    HEALING("healing_tnt", 40, Detonations::healing);
+    HEALING("healing_tnt", 40, Detonations::healing),
+    BLACK_HOLE("black_hole_tnt", 100, Detonations::blackHole),
+    ANTIGRAVITY("antigravity_tnt", 60, Detonations::antigravity),
+    BRIDGE("bridge_tnt", 40, Detonations::bridge),
+    WALL("wall_tnt", 40, Detonations::wall),
+    HORDE("horde_tnt", 60, Detonations::horde),
+    SONIC("sonic_tnt", 60, Detonations::sonic),
+    SMOKE("smoke_tnt", 40, Detonations::smoke),
+    XRAY("xray_tnt", 40, Detonations::xray),
+    NATURE("nature_tnt", 40, Detonations::nature),
+    ANTIMATTER("antimatter_tnt", 120, Detonations::antimatter),
+    NETHER("nether_tnt", 60, Detonations::nether),
+    METEOR("meteor_tnt", 60, Detonations::meteor),
+    ARROW_RAIN("arrow_rain_tnt", 40, Detonations::arrowRain),
+    COBWEB("cobweb_tnt", 40, Detonations::cobweb),
+    STORM("storm_tnt", 60, Detonations::storm),
+    MAGNET("magnet_tnt", 40, Detonations::magnet),
+    SPONGE("sponge_tnt", 40, Detonations::sponge),
+    TORCH("torch_tnt", 40, Detonations::torch),
+    SHOCKWAVE("shockwave_tnt", 60, Detonations::shockwave),
+    DOME("dome_tnt", 40, Detonations::dome),
+    CHAIN("chain_tnt", 40, Detonations::chain),
+    LUMBER("lumber_tnt", 40, Detonations::lumber),
+    HARVEST("harvest_tnt", 40, Detonations::harvest);
 
     @FunctionalInterface
     public interface Detonation {

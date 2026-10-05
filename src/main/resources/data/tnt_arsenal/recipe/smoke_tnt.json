@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:campfire"
+  ],
+  "result": {
+    "id": "tnt_arsenal:smoke_tnt",
+    "count": 1
+  }
+}

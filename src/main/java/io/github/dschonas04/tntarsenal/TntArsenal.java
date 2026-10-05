@@ -35,6 +35,15 @@ public final class TntArsenal implements ModInitializer {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
+    /** Entry points for the server mixin; the task list itself stays package-private. */
+    public static void tickTasks() {
+        Tasks.tickAll();
+    }
+
+    public static void clearTasks() {
+        Tasks.clear();
+    }
+
     @Override
     public void onInitialize() {
         for (Kind kind : Kind.values()) {

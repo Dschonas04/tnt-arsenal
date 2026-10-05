@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:glass",
+    "minecraft:glass"
+  ],
+  "result": {
+    "id": "tnt_arsenal:xray_tnt",
+    "count": 1
+  }
+}
