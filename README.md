@@ -1,5 +1,11 @@
 # TNT Arsenal
 
+[![Build](https://github.com/Dschonas04/tnt-arsenal/actions/workflows/build.yml/badge.svg)](https://github.com/Dschonas04/tnt-arsenal/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/Dschonas04/tnt-arsenal)](https://github.com/Dschonas04/tnt-arsenal/releases/latest)
+[![Minecraft 26.2](https://img.shields.io/badge/Minecraft-26.2-62b47a)](https://www.minecraft.net)
+[![Fabric](https://img.shields.io/badge/loader-Fabric-dbd0b4)](https://fabricmc.net)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Sixty kinds of TNT for Minecraft 26.2 (Fabric), each with its own hand-drawn
 look and its own way of going off. They are crafted at an ordinary crafting table,
 so **JEI and REI show every recipe**.
@@ -106,21 +112,26 @@ work over several ticks instead of stalling one, and never load chunks.
 
 ## Install
 
-Put the jar into `mods/` on the server **and** on every client — the blocks are
-registered, so both sides need them. Requires Fabric Loader 0.19+ and Fabric API.
+1. Minecraft 26.2 with Fabric Loader 0.19 or newer and
+   [Fabric API](https://modrinth.com/mod/fabric-api).
+2. Download `tnt-arsenal-<version>.jar` from the
+   [releases](https://github.com/Dschonas04/tnt-arsenal/releases/latest).
+3. Put it into `mods/` on the server **and** on every client: the blocks are
+   registered, so both sides need them.
 
 ## How it works
 
 Minecraft 26.2 ships without obfuscation, so the mod is compiled straight against
-the server jar — no mappings, no Loom, plain Gradle:
+the server jar — no mappings, no Loom, plain Gradle and Java 25:
 
-```
-gradle build -Pminecraft_jar=/path/to/server-26.2.jar
+```bash
+tools/fetch-libs.sh   # server jar from Mojang, two Fabric API modules, into libs/
+gradle build          # the jar lands in build/libs/
 ```
 
-Two Fabric API modules (`fabric-api-base`, `fabric-creative-tab-api-v1`) go into
-`libs/` as compile-only dependencies; they are inside every `fabric-api` jar under
-`META-INF/jars/`.
+The two Fabric API modules (`fabric-api-base`, `fabric-creative-tab-api-v1`) are
+compile-only dependencies; they are inside every `fabric-api` jar under
+`META-INF/jars/`, and the script takes them from there.
 
 Each kind is an ordinary `TntBlock` subclass. When it primes, the primed entity
 carries the block's state — vanilla renders it with that texture, so the mod needs
@@ -140,6 +151,13 @@ recipes, the mod icon and the preview sheet above.
 python3 tools/textures.py
 ```
 
+## Contributing
+
+Bug reports and pull requests are welcome, see
+[CONTRIBUTING.md](CONTRIBUTING.md). Security problems please report
+privately, see [SECURITY.md](SECURITY.md). What changed in each version is in
+[CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
-MIT
+[MIT](LICENSE)
