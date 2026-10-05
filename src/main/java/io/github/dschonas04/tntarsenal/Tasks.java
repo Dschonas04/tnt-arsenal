@@ -28,15 +28,30 @@ final class Tasks {
 
     private static final class Running {
         final Task task;
+        final Runnable onAbort;
         int age;
 
-        Running(Task task) {
+        Running(Task task, Runnable onAbort) {
             this.task = task;
+            this.onAbort = onAbort;
+        }
+
+        void abort() {
+            try {
+                onAbort.run();
+            } catch (RuntimeException e) {
+                LOG.error("Cleaning up after a TNT Arsenal detonation failed", e);
+            }
         }
     }
 
     static void start(Task task) {
-        STARTED.add(new Running(task));
+        start(task, () -> { });
+    }
+
+    /** Like {@link #start(Task)}, but runs {@code onAbort} if the task fails or the server stops before it is done. */
+    static void start(Task task, Runnable onAbort) {
+        STARTED.add(new Running(task, onAbort));
     }
 
     /** Called from the server tick. Tasks started during this tick run from the next one. */
@@ -50,6 +65,7 @@ final class Tasks {
                 done = running.task.tick(running.age++);
             } catch (RuntimeException e) {
                 LOG.error("A TNT Arsenal detonation failed and was stopped", e);
+                running.abort();
                 done = true;
             }
             if (done) it.remove();
@@ -58,6 +74,8 @@ final class Tasks {
 
     /** Drops everything when the server stops, so no task outlives its world. */
     static void clear() {
+        RUNNING.forEach(Running::abort);
+        STARTED.forEach(Running::abort);
         RUNNING.clear();
         STARTED.clear();
     }

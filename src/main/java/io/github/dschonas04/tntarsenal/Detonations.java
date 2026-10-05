@@ -290,6 +290,11 @@ final class Detonations {
                 if (level.setChunkForced(cx, cz, true)) forced.add(new long[]{cx, cz});
             }
         }
+        // released exactly once: after the scorching, or when a task fails or the server stops
+        Runnable release = () -> {
+            for (long[] chunk : forced) level.setChunkForced((int) chunk[0], (int) chunk[1], false);
+            forced.clear();
+        };
         Tasks.start(age -> {
             if (age % 2 != 0) return false;
             int r = age / 2 + 1;
@@ -313,12 +318,10 @@ final class Detonations {
                 }
             }
             if (r < 55) return false;
-            scorch(level, center, () -> {
-                for (long[] chunk : forced) level.setChunkForced((int) chunk[0], (int) chunk[1], false);
-            });
+            scorch(level, center, release);
             fallout(level, c);
             return true;
-        });
+        }, release);
         // the mushroom cloud
         Tasks.start(age -> {
             double stem = Math.min(age, 50) * 1.0;
@@ -1343,7 +1346,7 @@ final class Detonations {
             if (dy > -40) return false;
             done.run();
             return true;
-        });
+        }, done);
     }
 
     /**
