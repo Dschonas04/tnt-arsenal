@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:wither_rose"
+  ],
+  "result": {
+    "id": "tnt_arsenal:curse_tnt",
+    "count": 1
+  }
+}

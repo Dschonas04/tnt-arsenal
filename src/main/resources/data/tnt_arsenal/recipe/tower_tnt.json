@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:ladder",
+    "minecraft:ladder",
+    "minecraft:stone_bricks"
+  ],
+  "result": {
+    "id": "tnt_arsenal:tower_tnt",
+    "count": 1
+  }
+}

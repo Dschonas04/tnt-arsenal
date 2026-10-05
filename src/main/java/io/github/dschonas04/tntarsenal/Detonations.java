@@ -61,6 +61,16 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.animal.bee.Bee;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.StairBlock;
 
 /**
  * What each kind does when its fuse runs out. Every method gets the level and
@@ -243,6 +253,8 @@ final class Detonations {
             level.explode(t, x + Math.cos(angle) * 10, y, z + Math.sin(angle) * 10, 10, true, Level.ExplosionInteraction.BLOCK);
         }
         level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 16.0f, 0.5f);
+        scorch(level, t.blockPosition());
+        fallout(level, new Vec3(x, y, z));
         Tasks.start(age -> {
             double stem = Math.min(age, 40) * 0.75;
             level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, y + stem, z, 12, 1.5, 1.0, 1.5, 0.01);
@@ -1149,5 +1161,577 @@ final class Detonations {
             return age >= 20;
         });
         level.sendParticles(ParticleTypes.FIREWORK, c.x, c.y + 1, c.z, 60, 1, 1, 1, 0.2);
+    }
+
+    // --- the nuke's aftermath ----------------------------------------------
+
+    /**
+     * Scorched earth around ground zero, one layer per tick: grass turns to
+     * coarse dirt, leaves and plants burn away, and the crater floor within 14
+     * blocks glazes over with blackstone and glowing magma.
+     */
+    private static void scorch(ServerLevel level, BlockPos center) {
+        RandomSource random = level.getRandom();
+        Tasks.start(age -> {
+            int dy = 14 - age;
+            for (int dx = -30; dx <= 30; dx++) {
+                for (int dz = -30; dz <= 30; dz++) {
+                    int d = dx * dx + dz * dz;
+                    if (d > 900) continue;
+                    BlockPos pos = center.offset(dx, dy, dz);
+                    if (!level.isLoaded(pos)) continue;
+                    BlockState state = level.getBlockState(pos);
+                    if (!removable(level, pos, state)) continue;
+                    boolean open = level.getBlockState(pos.above()).isAir();
+                    BlockState into = null;
+                    if (state.is(BlockTags.LEAVES) || state.is(Blocks.SNOW)) {
+                        into = Blocks.AIR.defaultBlockState();
+                    } else if (state.canBeReplaced() && state.getFluidState().isEmpty()) {
+                        into = random.nextFloat() < 0.15f && level.getBlockState(pos.below()).is(BlockTags.DIRT)
+                                ? Blocks.DEAD_BUSH.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                    } else if (open && d <= 196 && ground(state)) {
+                        float roll = random.nextFloat();
+                        into = roll < 0.08f ? Blocks.MAGMA_BLOCK.defaultBlockState()
+                                : roll < 0.4f ? Blocks.BLACKSTONE.defaultBlockState() : null;
+                    } else if (state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.PODZOL) || state.is(Blocks.MYCELIUM) || state.is(Blocks.MOSS_BLOCK)) {
+                        into = Blocks.COARSE_DIRT.defaultBlockState();
+                    }
+                    if (into != null) level.setBlock(pos, into, QUIET);
+                }
+            }
+            return dy <= -8;
+        });
+    }
+
+    /**
+     * Fallout: three minutes of radiation within 48 blocks. Everyone inside is
+     * poisoned, starved and weakened; within 24 blocks the wither sets in. Green
+     * motes drift over the zone and a Geiger counter ticks for every player in
+     * it — faster the closer they are. Milk helps for a moment; leaving helps.
+     */
+    private static void fallout(ServerLevel level, Vec3 c) {
+        DustParticleOptions glow = new DustParticleOptions(0x7CFF3A, 1.6f);
+        RandomSource random = level.getRandom();
+        Tasks.start(age -> {
+            if (age % 4 == 0) {
+                level.sendParticles(glow, c.x, c.y + 3, c.z, 40, 22, 4, 22, 0);
+                level.sendParticles(ParticleTypes.WHITE_ASH, c.x, c.y + 10, c.z, 60, 26, 8, 26, 0);
+            }
+            for (LivingEntity entity : around(level, c, LivingEntity.class, 48)) {
+                double dist = Math.sqrt(entity.distanceToSqr(c));
+                boolean hot = dist < 24;
+                if (age % 20 == 0) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, hot ? 1 : 0));
+                    entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 60, 1));
+                    entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 60, 0));
+                    if (hot) {
+                        entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 60, 0));
+                        entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 100, 0));
+                    }
+                }
+                if (entity instanceof Player player && age % (hot ? 3 : 7) == 0 && random.nextFloat() < 0.8f) {
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SCULK_CLICKING,
+                            SoundSource.AMBIENT, 0.5f, 1.6f + random.nextFloat() * 0.4f);
+                }
+            }
+            return age >= 3600;
+        });
+    }
+
+    // --- landscapes ----------------------------------------------------------
+
+    /** The topmost block of a column near the given height that has air above it. */
+    private static BlockPos surface(ServerLevel level, BlockPos column, int up, int down) {
+        for (int dy = up; dy >= -down; dy--) {
+            BlockPos pos = column.above(dy);
+            if (!level.isLoaded(pos)) return null;
+            BlockState state = level.getBlockState(pos);
+            if (!state.isAir() && !state.canBeReplaced() && level.getBlockState(pos.above()).canBeReplaced()) return pos;
+        }
+        return null;
+    }
+
+    /** Sculk spreads over the ground around it, with a sensor here and there. */
+    static void sculk(ServerLevel level, PrimedTnt t) {
+        RandomSource random = level.getRandom();
+        for (BlockPos pos : sphere(t.blockPosition(), 9)) {
+            BlockState state = level.getBlockState(pos);
+            if (!ground(state) || !removable(level, pos, state)) continue;
+            boolean open = level.getBlockState(pos.above()).canBeReplaced();
+            if (open || random.nextFloat() < 0.35f) level.setBlock(pos, Blocks.SCULK.defaultBlockState(), QUIET);
+            if (open && random.nextFloat() < 0.03f && level.getBlockState(pos.above()).isAir()) {
+                level.setBlock(pos.above(), Blocks.SCULK_SENSOR.defaultBlockState(), FLAGS);
+            }
+        }
+        sound(level, t.position(), SoundEvents.SCULK_CATALYST_BLOOM, 4.0f, 0.8f);
+        particles(level, ParticleTypes.SCULK_SOUL, t.position(), 120, 5, 0.05);
+    }
+
+    /** Turns the land into desert: sand, sandstone, dead bushes and the odd cactus. Water dries up. */
+    static void desert(ServerLevel level, PrimedTnt t) {
+        RandomSource random = level.getRandom();
+        List<BlockPos> area = sphere(t.blockPosition(), 9);
+        for (BlockPos pos : area) {
+            BlockState state = level.getBlockState(pos);
+            if (!removable(level, pos, state)) continue;
+            BlockState into = null;
+            if (state.is(BlockTags.DIRT) || state.is(Blocks.GRAVEL)) {
+                into = (level.getBlockState(pos.above()).canBeReplaced() ? Blocks.SAND : Blocks.SANDSTONE).defaultBlockState();
+            } else if (state.is(BlockTags.BASE_STONE_OVERWORLD)) {
+                into = Blocks.SANDSTONE.defaultBlockState();
+            } else if (state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS)
+                    || (state.getBlock() instanceof LiquidBlock && state.getFluidState().is(Fluids.WATER))
+                    || (state.canBeReplaced() && state.getFluidState().isEmpty())) {
+                into = Blocks.AIR.defaultBlockState();
+            }
+            if (into != null) level.setBlock(pos, into, QUIET);
+        }
+        for (BlockPos pos : area) {
+            if (!level.getBlockState(pos).isAir() || !level.getBlockState(pos.below()).is(Blocks.SAND)) continue;
+            float roll = random.nextFloat();
+            if (roll < 0.05f) {
+                level.setBlock(pos, Blocks.DEAD_BUSH.defaultBlockState(), FLAGS);
+            } else if (roll < 0.07f && Direction.Plane.HORIZONTAL.stream().allMatch(d -> level.getBlockState(pos.relative(d)).isAir())) {
+                for (int h = 0; h < 1 + random.nextInt(3); h++) level.setBlock(pos.above(h), Blocks.CACTUS.defaultBlockState(), FLAGS);
+            }
+        }
+        sound(level, t.position(), SoundEvents.SAND_BREAK, 3.0f, 0.6f);
+        particles(level, ParticleTypes.WHITE_ASH, t.position(), 200, 6, 0.02);
+    }
+
+    /** A piece of the End: end stone, purpur where the wood was, chorus flowers and two endermites. */
+    static void end(ServerLevel level, PrimedTnt t) {
+        RandomSource random = level.getRandom();
+        List<BlockPos> area = sphere(t.blockPosition(), 9);
+        for (BlockPos pos : area) {
+            BlockState state = level.getBlockState(pos);
+            if (!removable(level, pos, state)) continue;
+            BlockState into = null;
+            if (ground(state)) {
+                into = Blocks.END_STONE.defaultBlockState();
+            } else if (state.is(BlockTags.LOGS)) {
+                into = Blocks.PURPUR_PILLAR.defaultBlockState();
+                if (state.hasProperty(BlockStateProperties.AXIS)) {
+                    into = into.setValue(BlockStateProperties.AXIS, state.getValue(BlockStateProperties.AXIS));
+                }
+            } else if (state.is(BlockTags.LEAVES) || (state.getBlock() instanceof LiquidBlock && state.getFluidState().is(Fluids.WATER))
+                    || (state.canBeReplaced() && state.getFluidState().isEmpty())) {
+                into = Blocks.AIR.defaultBlockState();
+            }
+            if (into != null) level.setBlock(pos, into, QUIET);
+        }
+        for (BlockPos pos : area) {
+            if (random.nextFloat() < 0.025f && level.getBlockState(pos).isAir() && level.getBlockState(pos.below()).is(Blocks.END_STONE)) {
+                level.setBlock(pos, Blocks.CHORUS_FLOWER.defaultBlockState(), FLAGS);
+            }
+        }
+        for (int i = 0; i < 2; i++) EntityTypes.ENDERMITE.spawn(level, t.blockPosition().above(), EntitySpawnReason.TRIGGERED);
+        sound(level, t.position(), SoundEvents.END_PORTAL_SPAWN, 2.0f, 1.2f);
+        particles(level, ParticleTypes.PORTAL, t.position(), 400, 6, 0.4);
+    }
+
+    /** Paints the ground in rainbow rings of concrete. */
+    static void rainbow(ServerLevel level, PrimedTnt t) {
+        DyeColor[] rings = {DyeColor.RED, DyeColor.ORANGE, DyeColor.YELLOW, DyeColor.LIME, DyeColor.LIGHT_BLUE, DyeColor.BLUE, DyeColor.PURPLE, DyeColor.MAGENTA};
+        BlockPos center = t.blockPosition();
+        for (int dx = -12; dx <= 12; dx++) {
+            for (int dz = -12; dz <= 12; dz++) {
+                double d = Math.sqrt(dx * dx + dz * dz);
+                if (d > 12) continue;
+                BlockPos top = surface(level, center.offset(dx, 0, dz), 4, 6);
+                if (top == null) continue;
+                BlockState state = level.getBlockState(top);
+                if (!removable(level, top, state) || !state.isCollisionShapeFullBlock(level, top)) continue;
+                DyeColor colour = rings[Math.min(rings.length - 1, (int) (d / 1.5))];
+                level.setBlock(top, Blocks.CONCRETE.pick(colour).defaultBlockState(), FLAGS);
+            }
+        }
+        sound(level, t.position(), SoundEvents.NOTE_BLOCK_CHIME.value(), 3.0f, 1.0f);
+        level.sendParticles(ParticleTypes.FIREWORK, t.getX(), t.getY() + 1, t.getZ(), 200, 6, 1, 6, 0.1);
+    }
+
+    /**
+     * An earthquake: the ground shakes in waves for three seconds — everyone
+     * nearby is thrown about and gets dizzy — and three to five jagged fissures
+     * tear open from the centre outwards, 28 blocks long and down to just above
+     * bedrock.
+     */
+    static void earthquake(ServerLevel level, PrimedTnt t) {
+        Vec3 c = t.position();
+        BlockPos center = t.blockPosition();
+        RandomSource random = level.getRandom();
+        int floor = level.getMinY() + 6;
+        int count = 3 + random.nextInt(3);
+        double[] angle = new double[count];
+        double[] x = new double[count];
+        double[] z = new double[count];
+        for (int i = 0; i < count; i++) {
+            angle[i] = Math.PI * 2 * i / count + (random.nextDouble() - 0.5) * 0.8;
+            x[i] = center.getX() + 0.5;
+            z[i] = center.getZ() + 0.5;
+        }
+        level.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 6.0f, 0.3f);
+        Tasks.start(age -> {
+            // the fissures: every tick each one grows by a block, as deep as it goes
+            if (age < 28) {
+                for (int i = 0; i < count; i++) {
+                    angle[i] += (random.nextDouble() - 0.5) * 0.5;
+                    x[i] += Math.cos(angle[i]);
+                    z[i] += Math.sin(angle[i]);
+                    int width = age < 22 ? 2 : 1;
+                    for (int w = 0; w < width; w++) {
+                        BlockPos column = BlockPos.containing(x[i] + w * -Math.sin(angle[i]), center.getY(), z[i] + w * Math.cos(angle[i]));
+                        if (!level.isLoaded(column)) continue;
+                        int top = level.getHeight(Heightmap.Types.WORLD_SURFACE, column.getX(), column.getZ());
+                        for (int y = top; y >= floor; y--) {
+                            BlockPos pos = new BlockPos(column.getX(), y, column.getZ());
+                            BlockState state = level.getBlockState(pos);
+                            if (removable(level, pos, state) && state.getFluidState().isEmpty()) {
+                                level.setBlock(pos, Blocks.AIR.defaultBlockState(), QUIET);
+                            }
+                        }
+                        level.sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, column.getX() + 0.5, top + 0.5, column.getZ() + 0.5, 3, 0.4, 0.2, 0.4, 0.02);
+                    }
+                }
+            }
+            // the shaking
+            if (age % 10 == 0) {
+                level.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 3.0f, 0.2f + random.nextFloat() * 0.2f);
+                for (LivingEntity entity : around(level, c, LivingEntity.class, 24)) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 160, 0));
+                    if (entity.onGround()) {
+                        entity.setDeltaMovement(entity.getDeltaMovement().add((random.nextDouble() - 0.5) * 0.6, 0.35, (random.nextDouble() - 0.5) * 0.6));
+                        entity.hurtMarked = true;
+                        entity.hurtServer(level, level.damageSources().fall(), 1.5f);
+                    }
+                }
+                level.sendParticles(ParticleTypes.DUST_PLUME, c.x, c.y, c.z, 80, 12, 0.3, 12, 0.02);
+            }
+            return age >= 60;
+        });
+    }
+
+    /**
+     * A volcano: a cone of basalt, blackstone and magma with a lava crater on
+     * top, which then erupts for fifteen seconds, hurling burning lava bombs.
+     */
+    static void volcano(ServerLevel level, PrimedTnt t) {
+        BlockPos base = t.blockPosition();
+        RandomSource random = level.getRandom();
+        for (int h = 0; h <= 8; h++) {
+            int r = 8 - h;
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (dx * dx + dz * dz > r * r + r) continue;
+                    BlockPos pos = base.offset(dx, h, dz);
+                    boolean crater = h >= 6 && dx * dx + dz * dz <= 1;
+                    BlockState rock = crater ? Blocks.LAVA.defaultBlockState()
+                            : (random.nextFloat() < 0.15f ? Blocks.MAGMA_BLOCK : random.nextBoolean() ? Blocks.BASALT : Blocks.BLACKSTONE).defaultBlockState();
+                    place(level, pos, rock);
+                }
+            }
+        }
+        Vec3 top = Vec3.atCenterOf(base.above(8));
+        sound(level, top, SoundEvents.BASALT_BREAK, 4.0f, 0.5f);
+        Tasks.start(age -> {
+            level.sendParticles(ParticleTypes.LAVA, top.x, top.y, top.z, 6, 0.6, 0.3, 0.6, 0);
+            level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, top.x, top.y + 1, top.z, 3, 0.5, 0.5, 0.5, 0.02);
+            if (age % 25 == 0) {
+                level.playSound(null, top.x, top.y, top.z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 3.0f, 0.5f);
+                launchBomb(level, t, top, random);
+            }
+            return age >= 300;
+        });
+    }
+
+    private static void launchBomb(ServerLevel level, PrimedTnt t, Vec3 from, RandomSource random) {
+        BlockPos at = BlockPos.containing(from.x, from.y + 1.5, from.z);
+        if (!level.getBlockState(at).isAir()) return;
+        FallingBlockEntity bomb = FallingBlockEntity.fall(level, at, Blocks.MAGMA_BLOCK.defaultBlockState());
+        bomb.disableDrop();
+        bomb.setHurtsEntities(2.0f, 20);
+        bomb.setDeltaMovement((random.nextDouble() - 0.5) * 1.2, 1.0 + random.nextDouble() * 0.6, (random.nextDouble() - 0.5) * 1.2);
+        Vec3[] last = {bomb.position()};
+        Tasks.start(age -> {
+            if (bomb.isAlive() && age < 200) {
+                last[0] = bomb.position();
+                level.sendParticles(ParticleTypes.FLAME, last[0].x, last[0].y + 0.5, last[0].z, 4, 0.2, 0.2, 0.2, 0.01);
+                return false;
+            }
+            bomb.discard();
+            level.explode(t, last[0].x, last[0].y, last[0].z, 1.5f, true, Level.ExplosionInteraction.TNT);
+            return true;
+        });
+    }
+
+    // --- building, part two --------------------------------------------------
+
+    /**
+     * A spiral staircase of stone-brick stairs down to 48 blocks deep around a
+     * pillar with a glowstone every four steps down. Ores drop, liquids are sealed.
+     */
+    static void staircase(ServerLevel level, PrimedTnt t) {
+        pop(level, t, 1);
+        BlockPos center = t.blockPosition();
+        int[][] ring = {{-1, -1}, {0, -1}, {1, -1}, {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}};
+        int bottom = Math.max(level.getMinY() + 6, center.getY() - 48);
+        Tasks.start(age -> {
+            int step = age;
+            int y = center.getY() - 1 - step;
+            if (y < bottom) return true;
+            int[] cell = ring[step % 8];
+            int[] previous = ring[(step + 7) % 8];
+            BlockPos floor = new BlockPos(center.getX() + cell[0], y, center.getZ() + cell[1]);
+            if (!level.isLoaded(floor)) return true;
+            for (int h = 1; h <= 4; h++) dig(level, floor.above(h));
+            for (int h = 0; h <= 5; h++) {
+                for (Direction d : Direction.Plane.HORIZONTAL) seal(level, floor.above(h).relative(d));
+            }
+            seal(level, floor.below());
+            // The step faces back up the spiral, towards the previous cell.
+            Direction up = Direction.getApproximateNearest(previous[0] - cell[0], 0, previous[1] - cell[1]);
+            BlockState stair = Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, up);
+            BlockState old = level.getBlockState(floor);
+            if (old.canBeReplaced() || removable(level, floor, old)) level.setBlock(floor, stair, FLAGS);
+            BlockPos pillar = new BlockPos(center.getX(), y, center.getZ());
+            BlockState core = level.getBlockState(pillar);
+            if (core.canBeReplaced() || removable(level, pillar, core)) {
+                level.setBlock(pillar, (step % 4 == 0 ? Blocks.GLOWSTONE : Blocks.STONE_BRICKS).defaultBlockState(), FLAGS);
+            }
+            if (step % 3 == 0) sound(level, Vec3.atCenterOf(floor), SoundEvents.STONE_PLACE, 1.0f, 0.8f);
+            return false;
+        });
+    }
+
+    /**
+     * Carves a bunker under the TNT: a lit room nine by nine and four high,
+     * walled with stone bricks, with a ladder up to where the TNT stood.
+     */
+    static void bunker(ServerLevel level, PrimedTnt t) {
+        pop(level, t, 1);
+        BlockPos center = t.blockPosition();
+        BlockPos roomFloor = center.below(6);
+        for (int dx = -5; dx <= 5; dx++) {
+            for (int dz = -5; dz <= 5; dz++) {
+                for (int dy = 0; dy <= 5; dy++) {
+                    BlockPos pos = roomFloor.offset(dx, dy, dz);
+                    boolean shell = Math.abs(dx) == 5 || Math.abs(dz) == 5 || dy == 0 || dy == 5;
+                    if (!level.isLoaded(pos)) continue;
+                    BlockState state = level.getBlockState(pos);
+                    if (shell) {
+                        if (state.canBeReplaced() || (removable(level, pos, state) && !state.isCollisionShapeFullBlock(level, pos))) {
+                            level.setBlock(pos, Blocks.STONE_BRICKS.defaultBlockState(), FLAGS);
+                        }
+                    } else if (removable(level, pos, state)) {
+                        if (state.is(ORES)) Block.dropResources(state, level, pos);
+                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), FLAGS);
+                    }
+                }
+            }
+        }
+        for (int[] l : new int[][]{{-2, -2}, {2, -2}, {-2, 2}, {2, 2}}) {
+            BlockPos lamp = roomFloor.offset(l[0], 5, l[1]);
+            if (removable(level, lamp, level.getBlockState(lamp)) || level.getBlockState(lamp).canBeReplaced()) {
+                level.setBlock(lamp, Blocks.GLOWSTONE.defaultBlockState(), FLAGS);
+            }
+        }
+        // shaft along the north wall, from the room floor up to the surface
+        for (int dy = 1; dy <= 6; dy++) {
+            BlockPos ladder = roomFloor.offset(0, dy, -4);
+            BlockPos wall = ladder.north();
+            if (dy >= 5) dig(level, ladder);
+            if (level.getBlockState(wall).canBeReplaced()) level.setBlock(wall, Blocks.STONE_BRICKS.defaultBlockState(), FLAGS);
+            if (level.getBlockState(ladder).isAir()) {
+                level.setBlock(ladder, Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.SOUTH), FLAGS);
+            }
+        }
+        sound(level, t.position(), SoundEvents.STONE_BREAK, 2.0f, 0.6f);
+    }
+
+    /** A 15×15 stone-brick floor at the height the TNT stood on — a skybridge or a raft. */
+    static void platform(ServerLevel level, PrimedTnt t) {
+        BlockPos center = t.blockPosition().below();
+        Tasks.start(age -> {
+            int r = age;
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (Math.max(Math.abs(dx), Math.abs(dz)) != r) continue;
+                    place(level, center.offset(dx, 0, dz), Blocks.STONE_BRICKS.defaultBlockState());
+                }
+            }
+            sound(level, Vec3.atCenterOf(center), SoundEvents.STONE_PLACE, 1.5f, 1.0f);
+            return r >= 7;
+        });
+    }
+
+    /**
+     * A watchtower 24 blocks high, built from the ground up around the TNT:
+     * a ladder inside and a battlemented platform with a lantern on top.
+     */
+    static void tower(ServerLevel level, PrimedTnt t) {
+        BlockPos base = t.blockPosition();
+        BlockState bricks = Blocks.STONE_BRICKS.defaultBlockState();
+        Tasks.start(age -> {
+            int h = age;
+            if (h < 24) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dz = -1; dz <= 1; dz++) {
+                        if (dx != 0 || dz != 0) place(level, base.offset(dx, h, dz), bricks);
+                    }
+                }
+                BlockPos ladder = base.above(h);
+                if (level.getBlockState(ladder).canBeReplaced()) {
+                    level.setBlock(ladder, Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.SOUTH), FLAGS);
+                }
+                if (h % 2 == 0) sound(level, Vec3.atCenterOf(ladder), SoundEvents.STONE_PLACE, 1.0f, 0.9f);
+                return false;
+            }
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    if (dx != 0 || dz != 0) place(level, base.offset(dx, 24, dz), bricks);
+                    boolean edge = Math.abs(dx) == 2 || Math.abs(dz) == 2;
+                    if (edge && Math.floorMod(dx + dz, 2) == 0) place(level, base.offset(dx, 25, dz), bricks);
+                }
+            }
+            BlockPos hatch = base.above(24);
+            if (level.getBlockState(hatch).canBeReplaced()) {
+                level.setBlock(hatch, Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.SOUTH), FLAGS);
+            }
+            place(level, base.offset(1, 25, 1), Blocks.LANTERN.defaultBlockState());
+            sound(level, Vec3.atCenterOf(base.above(24)), SoundEvents.BELL_BLOCK, 2.0f, 1.0f);
+            return true;
+        });
+    }
+
+    // --- spells ----------------------------------------------------------------
+
+    /** Curses every creature within ten blocks except the one who lit it: weak, slow, tired, hungry and glowing. */
+    static void curse(ServerLevel level, PrimedTnt t) {
+        pop(level, t, 1);
+        LivingEntity owner = t.getOwner();
+        for (LivingEntity entity : around(level, t, LivingEntity.class, 10)) {
+            if (entity == owner) continue;
+            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 600, 1));
+            entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 600, 1));
+            entity.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, 600, 1));
+            entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 600, 1));
+            entity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 600, 0));
+        }
+        sound(level, t.position(), SoundEvents.WITHER_AMBIENT, 2.0f, 0.6f);
+        particles(level, ParticleTypes.WITCH, t.position(), 200, 5, 0.1);
+    }
+
+    /** Blesses every player within twelve blocks: strength, speed, haste, regeneration, resistance and fire resistance for two minutes. */
+    static void blessing(ServerLevel level, PrimedTnt t) {
+        for (Player player : around(level, t, Player.class, 12)) {
+            player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 2400, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.SPEED, 2400, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.HASTE, 2400, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 2400, 0));
+            player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 2400, 0));
+            player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 2400, 0));
+        }
+        sound(level, t.position(), SoundEvents.TOTEM_USE, 1.5f, 1.2f);
+        particles(level, ParticleTypes.TOTEM_OF_UNDYING, t.position().add(0, 1, 0), 300, 3, 0.4);
+    }
+
+    /** Freezes every mob within twelve blocks in place for ten seconds — even in mid-air. */
+    static void stasis(ServerLevel level, PrimedTnt t) {
+        List<Mob> frozen = new ArrayList<>();
+        for (Mob mob : around(level, t, Mob.class, 12)) {
+            if (mob.isNoAi()) continue; // already still on purpose; leave it that way
+            mob.setNoAi(true);
+            mob.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0));
+            frozen.add(mob);
+        }
+        Vec3 c = t.position();
+        sound(level, c, SoundEvents.BEACON_POWER_SELECT, 3.0f, 0.5f);
+        Tasks.start(age -> {
+            if (age % 5 == 0) {
+                for (Mob mob : frozen) {
+                    if (mob.isAlive()) level.sendParticles(ParticleTypes.END_ROD, mob.getX(), mob.getY() + mob.getBbHeight() / 2, mob.getZ(), 2, 0.3, 0.4, 0.3, 0);
+                }
+            }
+            if (age < 200) return false;
+            for (Mob mob : frozen) if (mob.isAlive()) mob.setNoAi(false);
+            sound(level, c, SoundEvents.BEACON_DEACTIVATE, 2.0f, 1.4f);
+            return true;
+        });
+    }
+
+    // --- allies ------------------------------------------------------------------
+
+    /** Eight bees that go after every monster within twenty blocks. */
+    static void bees(ServerLevel level, PrimedTnt t) {
+        List<LivingEntity> enemies = new ArrayList<>();
+        for (LivingEntity entity : around(level, t, LivingEntity.class, 20)) {
+            if (entity instanceof Enemy) enemies.add(entity);
+        }
+        for (int i = 0; i < 8; i++) {
+            Bee bee = EntityTypes.BEE.spawn(level, t.blockPosition().above(), EntitySpawnReason.TRIGGERED);
+            if (bee == null || enemies.isEmpty()) continue;
+            bee.setTarget(enemies.get(i % enemies.size()));
+            ((NeutralMob) bee).startPersistentAngerTimer();
+        }
+        sound(level, t.position(), SoundEvents.BEE_LOOP_AGGRESSIVE, 3.0f, 1.0f);
+    }
+
+    /** A pack of four wolves, tamed to whoever lit the TNT. */
+    static void wolves(ServerLevel level, PrimedTnt t) {
+        LivingEntity owner = t.getOwner();
+        for (int i = 0; i < 4; i++) {
+            Wolf wolf = EntityTypes.WOLF.spawn(level, t.blockPosition(), EntitySpawnReason.TRIGGERED);
+            if (wolf != null && owner instanceof Player player) wolf.tame(player);
+        }
+        sound(level, t.position(), SoundEvents.PLAYER_LEVELUP, 2.0f, 0.8f);
+        particles(level, ParticleTypes.HEART, t.position().add(0, 1, 0), 20, 1.5, 0);
+    }
+
+    /** Two iron golems that guard the area — built by a player, so they leave players alone. */
+    static void golems(ServerLevel level, PrimedTnt t) {
+        for (int i = 0; i < 2; i++) {
+            IronGolem golem = EntityTypes.IRON_GOLEM.spawn(level, t.blockPosition().offset(i * 2 - 1, 0, 0), EntitySpawnReason.TRIGGERED);
+            if (golem != null) golem.setPlayerCreated(true);
+        }
+        sound(level, t.position(), SoundEvents.IRON_GOLEM_REPAIR, 3.0f, 0.8f);
+    }
+
+    /**
+     * Anti-air: the charge shoots straight up for up to 40 blocks and bursts —
+     * at the first thing in its way, or at the top. Hurts what flies, breaks nothing.
+     */
+    static void flak(ServerLevel level, PrimedTnt t) {
+        Vec3 start = t.position();
+        sound(level, start, SoundEvents.FIREWORK_ROCKET_LAUNCH, 3.0f, 0.6f);
+        Tasks.start(age -> {
+            Vec3 at = start.add(0, 1 + age * 2.0, 0);
+            BlockPos pos = BlockPos.containing(at);
+            boolean blocked = !level.isLoaded(pos) || !level.getBlockState(pos).canBeReplaced();
+            boolean target = !around(level, at, LivingEntity.class, 2.5).isEmpty();
+            level.sendParticles(ParticleTypes.FLAME, at.x, at.y, at.z, 6, 0.1, 0.3, 0.1, 0.01);
+            level.sendParticles(ParticleTypes.LARGE_SMOKE, at.x, at.y - 0.5, at.z, 3, 0.1, 0.2, 0.1, 0.01);
+            if (!blocked && !target && age < 20) return false;
+            Vec3 burst = blocked ? at.subtract(0, 1.5, 0) : at;
+            level.explode(t, burst.x, burst.y, burst.z, 4, false, Level.ExplosionInteraction.NONE);
+            level.sendParticles(ParticleTypes.FIREWORK, burst.x, burst.y, burst.z, 80, 1, 1, 1, 0.3);
+            return true;
+        });
+    }
+
+    /** Halloween: a ring of jack o'lanterns on the ground and a cloud of bats. */
+    static void halloween(ServerLevel level, PrimedTnt t) {
+        pop(level, t, 1);
+        BlockPos center = t.blockPosition();
+        for (int i = 0; i < 10; i++) {
+            double angle = Math.PI * 2 * i / 10;
+            BlockPos column = center.offset((int) Math.round(Math.cos(angle) * 6), 0, (int) Math.round(Math.sin(angle) * 6));
+            BlockPos ground = surface(level, column, 3, 4);
+            if (ground == null) continue;
+            Direction face = Direction.getApproximateNearest(center.getX() - column.getX(), 0, center.getZ() - column.getZ());
+            place(level, ground.above(), Blocks.JACK_O_LANTERN.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, face));
+        }
+        for (int i = 0; i < 12; i++) EntityTypes.BAT.spawn(level, center.above(2), EntitySpawnReason.TRIGGERED);
+        sound(level, t.position(), SoundEvents.ZOMBIE_AMBIENT, 2.0f, 0.5f);
+        particles(level, ParticleTypes.SOUL_FIRE_FLAME, t.position().add(0, 1, 0), 120, 4, 0.03);
     }
 }

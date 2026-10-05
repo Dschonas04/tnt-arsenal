@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:iron_block",
+    "minecraft:carved_pumpkin"
+  ],
+  "result": {
+    "id": "tnt_arsenal:golem_tnt",
+    "count": 1
+  }
+}

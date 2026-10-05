@@ -1,16 +1,16 @@
 # TNT Arsenal
 
-Forty-two kinds of TNT for Minecraft 26.2 (Fabric), each with its own hand-drawn
+Sixty kinds of TNT for Minecraft 26.2 (Fabric), each with its own hand-drawn
 look and its own way of going off. They are crafted at an ordinary crafting table,
 so **JEI and REI show every recipe**.
 
-![All forty-two kinds](docs/textures.png)
+![All sixty kinds](docs/textures.png)
 
 | Kind | What it does | Recipe (shapeless) |
 |---|---|---|
 | Mega TNT | twice the power of TNT | 4 × TNT |
 | Giga TNT | four times the power of TNT | 4 × Mega TNT + blaze powder |
-| Nuke TNT | a huge round crater, fire and a mushroom cloud | 4 × Giga TNT + nether star |
+| Nuke TNT | round crater, mushroom cloud, scorched land and three minutes of radiation | 4 × Giga TNT + nether star |
 | Fire TNT | sets everything around alight | TNT + fire charge |
 | Lightning TNT | a ring of lightning | TNT + lightning rod |
 | Cluster TNT | bursts into eight TNT | 3 × TNT + 2 × gunpowder |
@@ -50,11 +50,40 @@ so **JEI and REI show every recipe**.
 | Chain Reaction TNT | lights every TNT within 16 blocks | 2 × TNT + redstone torch |
 | Lumber TNT | fells every tree around, wood in one pile | TNT + iron axe |
 | Harvest TNT | harvests ripe fields and replants them | TNT + iron hoe |
+| Sculk TNT | spreads sculk over the ground | TNT + 2 × sculk |
+| Desert TNT | turns the land into desert | TNT + cactus + sand |
+| End TNT | a piece of the End: end stone, purpur and chorus | TNT + end stone + chorus fruit |
+| Rainbow TNT | paints the ground in rainbow rings | TNT + red dye + yellow dye + blue dye |
+| Earthquake TNT | shakes the ground and tears fissures down to bedrock | TNT + 3 × gravel |
+| Volcano TNT | raises a volcano that erupts for fifteen seconds | TNT + magma block + 2 × basalt |
+| Staircase TNT | a spiral staircase 48 blocks down | TNT + 2 × stone brick stairs |
+| Bunker TNT | carves a lit bunker under the TNT | TNT + iron door |
+| Platform TNT | a 15×15 stone floor — over water, air or lava | TNT + 3 × stone brick slab |
+| Tower TNT | a 24-block watchtower with ladder and battlements | TNT + 2 × ladder + stone bricks |
+| Curse TNT | curses every creature nearby except you | TNT + wither rose |
+| Blessing TNT | strength, speed, haste and more for every player nearby | TNT + golden apple |
+| Stasis TNT | freezes every mob nearby for ten seconds | TNT + clock |
+| Bee TNT | eight bees that hunt the monsters around | TNT + 2 × honeycomb |
+| Wolf Pack TNT | four wolves, tamed to you | TNT + 3 × bone |
+| Golem TNT | two iron golems guard the area | TNT + iron block + carved pumpkin |
+| Flak TNT | shoots up 40 blocks and bursts — anti-air | TNT + firework rocket + gunpowder |
+| Halloween TNT | a ring of jack o'lanterns and a cloud of bats | TNT + carved pumpkin + torch |
 
 They light like TNT: redstone, flint and steel, fire charges, burning arrows and
 other explosions. While the fuse burns they keep their own texture. Kinds that
 build or dig — drill, tunnel and bridge — go the way the player
 faced when placing the block.
+
+## The nuke
+
+The nuke is meant to be one. A core blast and a ring of eight around it leave a
+round crater; a mushroom cloud rises over it. Within thirty blocks the land is
+scorched — grass turns to coarse dirt, leaves and plants burn away, the crater
+floor glazes over with blackstone and glowing magma. Then the fallout: for three
+minutes everyone within 48 blocks is poisoned, starved and weakened, and within
+24 blocks the wither sets in. Green motes drift over the zone, and every player
+inside hears a Geiger counter that ticks faster the closer they are. Milk helps
+for a moment; leaving helps for good.
 
 ## What is never touched
 

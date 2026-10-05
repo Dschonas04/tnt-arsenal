@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:honeycomb",
+    "minecraft:honeycomb"
+  ],
+  "result": {
+    "id": "tnt_arsenal:bee_tnt",
+    "count": 1
+  }
+}

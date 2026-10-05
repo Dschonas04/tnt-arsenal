@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:stone_brick_stairs",
+    "minecraft:stone_brick_stairs"
+  ],
+  "result": {
+    "id": "tnt_arsenal:staircase_tnt",
+    "count": 1
+  }
+}

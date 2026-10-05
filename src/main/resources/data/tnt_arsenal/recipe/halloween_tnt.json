@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:carved_pumpkin",
+    "minecraft:torch"
+  ],
+  "result": {
+    "id": "tnt_arsenal:halloween_tnt",
+    "count": 1
+  }
+}

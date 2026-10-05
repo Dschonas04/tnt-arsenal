@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:iron_door"
+  ],
+  "result": {
+    "id": "tnt_arsenal:bunker_tnt",
+    "count": 1
+  }
+}

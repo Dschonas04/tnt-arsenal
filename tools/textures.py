@@ -143,6 +143,24 @@ ICONS = {
     "chain": ["aaa....", "a.a....", "aabbb..", "..b.b..", "..bbaaa", "....a.a", "....aaa"],
     "log": ["..aaaa..", ".abbbba.", "abccccba", "abcbbcba", "abcbbcba", "abccccba", ".abbbba.", "..aaaa.."],
     "wheat": ["b..b..b", "bb.b.bb", ".bbbbb.", "..bbb..", "..cac..", "..aaa..", ".a.a.a.", "a..a..a"],
+    "sculk": ["a.a..a.a", ".a.aa.a.", "..abba..", ".abccba.", ".abccba.", "..abba..", ".a.aa.a.", "a.a..a.a"],
+    "cactus": ["...ab...", "...ab...", "a..ab...", "ab.ab..a", ".aaab.ab", "...abaa.", "...ab...", "cccccccc"],
+    "island": ["......b.", ".....bbb", "......b.", "..aaaa..", ".acaaaa.", "aaaacaaa", ".aaaaaa.", "...aa..."],
+    "rainbow": ["..aaaa..", ".aabbaa.", "aabccbaa", "abccccba", "abc..cba", "ab....ba"],
+    "quake": [".c....c.", "...c....", "aaaadaaa", "aaadaaaa", "aaaadaaa", "aadaaaaa", "aaadaaaa", "aaaadaaa"],
+    "eruption": [".c.bb.c.", "..cbbc..", "...bb...", "...oo...", "..oaao..", ".oaaado.", "oaaaaddo", "oaaaaddo"],
+    "stairs": ["......bb", "......aa", "....bbaa", "....aaaa", "..bbaaaa", "..aaaaaa", "bbaaaaaa", "aaaaaaaa"],
+    "bunker": ["cccccccc", "dddddddd", "daaaaaad", "da....ad", "da.b..ad", "da....ad", "daaaaaad", "dddddddd"],
+    "platform": ["...cc...", "...cc...", "........", "aaaaaaaa", "bbbbbbbb", ".d....d.", ".d....d.", ".d....d."],
+    "tower": ["a.aa.a", "aaaaaa", ".abba.", ".abba.", ".aaaa.", ".adda.", ".adda.", ".aaaa."],
+    "broken": [".aa..aa.", "aaaa.aaa", "aaa.aaaa", "aaaa.aaa", ".aa.aaa.", "..aa.a..", "...aa..."],
+    "sun": ["...a....", ".a.a.a..", "..bbb...", "aabbbaa.", "..bbb...", ".a.a.a..", "...a...."],
+    "hourglass": ["aaaaaaa", ".abbba.", "..aba..", "...a...", "..a.a..", ".a.b.a.", "aaaaaaa"],
+    "bee": ["..bb.bb.", "..bbbbb.", ".adadad.", "dadadadc", "dadadad.", ".adadad."],
+    "wolf": ["a......a", "aa....aa", "aaaaaaaa", "adaaaada", "aaaaaaaa", ".aabbaa.", "..adda..", "..cccc.."],
+    "golem": [".aaaaaa.", ".avbbba.", ".adbbda.", ".abccba.", ".vbccba.", ".abbbva.", "..aaaa.."],
+    "rocket": ["...a....", "..aaa...", "..aba...", "..aaa...", "..aaa...", ".caaac..", ".c.c.c..", "..c.c..."],
+    "pumpkin": ["...v....", "..aaaa..", ".aaaaaa.", "adaadada", "aaaaaaaa", "adaddaad", ".adaada.", "..aaaa.."],
 }
 
 for name, rows in ICONS.items():
@@ -168,7 +186,7 @@ kind("mega_tnt", "Mega TNT", "Mega-TNT", "Twice the power of TNT", "Doppelte Spr
 kind("giga_tnt", "Giga TNT", "Giga-TNT", "Four times the power of TNT", "Vierfache Sprengkraft",
      "#8d1a1a", ("metal", "#8a8f96"), "#f1e6c8", "burst", {"a": "#ff7a1a", "b": "#fff2a8", "c": "#c81e1e"},
      "rivets", ["tnt_arsenal:mega_tnt"] * 4 + ["minecraft:blaze_powder"])
-kind("nuke_tnt", "Nuke TNT", "Atom-TNT", "A huge round crater, fire and a mushroom cloud", "Riesiger runder Krater, Feuer und Atompilz",
+kind("nuke_tnt", "Nuke TNT", "Atom-TNT", "Round crater, mushroom cloud, scorched land and three minutes of radiation", "Runder Krater, Atompilz, verbrannte Erde und drei Minuten Strahlung",
      "#4a5320", ("hazard",), "#f2c81b", "trefoil", {"a": "#1a1a1a"},
      "rivets", ["tnt_arsenal:giga_tnt"] * 4 + ["minecraft:nether_star"])
 kind("fire_tnt", "Fire TNT", "Feuer-TNT", "Sets everything around alight", "Setzt die Umgebung in Brand",
@@ -196,7 +214,7 @@ kind("water_tnt", "Water TNT", "Wasser-TNT", "Floods its crater", "Flutet den Kr
      "#1f6fb5", ("metal", "#8a9aa6"), "#dff0fb", "drop", {"a": "#2f8be0", "b": "#d6f0ff", "o": "#0d3f73"},
      "drip", [T, "minecraft:water_bucket"], ["#7cc4ff", "#4aa3f0"])
 kind("lava_tnt", "Lava TNT", "Lava-TNT", "Fills its crater with lava", "Füllt den Krater mit Lava",
-     "#3a2a26", ("metal", "#2a2422"), "#ffe0b3", "volcano", {"a": "#5a4a44", "d": "#2a1e1b", "c": "#ff7a00", "o": "#1a1211"},
+     "#3a2a26", ("metal", "#2a2422"), "#ffe0b3", "drop", {"a": "#ff7a00", "b": "#ffd23a", "o": "#8a2400"},
      "cracks", [T, "minecraft:lava_bucket"], ["#ffd23a", "#ff7a00", "#c23a00"])
 kind("frost_tnt", "Frost TNT", "Frost-TNT", "Freezes water, lava and creatures", "Friert Wasser, Lava und Lebewesen ein",
      "#6fb8de", ("metal", "#4a86a8"), "#eef8ff", "flake", {"a": "#3a8fc0", "b": "#a8e2ff"},
@@ -288,6 +306,61 @@ kind("lumber_tnt", "Lumber TNT", "Holzfäller-TNT", "Fells every tree around, wo
 kind("harvest_tnt", "Harvest TNT", "Ernte-TNT", "Harvests ripe fields and replants them", "Erntet reife Felder und pflanzt neu",
      "#c9a03a", ("rope", "#7a5a2a"), "#fff6dc", "wheat", {"a": "#6a8a2a", "b": "#e8c050", "c": "#8a5a2b"},
      "moss", [T, "minecraft:iron_hoe"], ["#e8c860", "#9a7a20"])
+
+kind("sculk_tnt", "Sculk TNT", "Sculk-TNT", "Spreads sculk over the ground", "Überzieht den Boden mit Sculk",
+     "#0b2e3a", ("metal", "#1f3a44"), "#0a1a20", "sculk", {"a": "#19a3b0", "b": "#6ff4ff", "c": "#e0ffff"},
+     "stars", [T, "minecraft:sculk", "minecraft:sculk"], ["#19d3e0", "#0f6a74"])
+kind("desert_tnt", "Desert TNT", "Wüsten-TNT", "Turns the land into desert", "Verwandelt die Umgebung in Wüste",
+     "#d8c27a", ("rope", "#9a7a4a"), "#fff4d8", "cactus", {"a": "#2f6b2a", "b": "#5fa83c", "c": "#c9a85a"},
+     "speck", [T, "minecraft:cactus", "minecraft:sand"], ["#c9b06a", "#efdca0"])
+kind("end_tnt", "End TNT", "End-TNT", "A piece of the End: end stone, purpur and chorus", "Ein Stück End: Endstein, Purpur und Chorus",
+     "#d6cf8e", ("metal", "#6a4a8a"), "#1c1426", "island", {"a": "#e6dfa0", "c": "#a8a060", "b": "#c58cff"},
+     "speck", [T, "minecraft:end_stone", "minecraft:chorus_fruit"], ["#b8b070", "#efe8b0"])
+kind("rainbow_tnt", "Rainbow TNT", "Regenbogen-TNT", "Paints the ground in rainbow rings", "Malt den Boden in Regenbogenringen an",
+     "#f2f2f2", ("rope", "#c95ad6"), "#ffffff", "rainbow", {"a": "#e8343a", "b": "#ffd23a", "c": "#3a8cff"},
+     "flowers", [T, "minecraft:red_dye", "minecraft:yellow_dye", "minecraft:blue_dye"], ["#e8343a", "#3a8cff", "#ffd23a", "#4be36b"])
+kind("earthquake_tnt", "Earthquake TNT", "Erdbeben-TNT", "Shakes the ground and tears fissures down to bedrock", "Lässt die Erde beben und reißt Spalten bis kurz vor Bedrock",
+     "#6b5640", ("metal", "#4a4f55"), "#efe4d0", "quake", {"a": "#8a6a4a", "d": "#1a1410", "c": "#a89070"},
+     "cracks", [T, "minecraft:gravel", "minecraft:gravel", "minecraft:gravel"], ["#1a120c", "#2a2018", "#3a2c20"])
+kind("volcano_tnt", "Volcano TNT", "Vulkan-TNT", "Raises a volcano that erupts for fifteen seconds", "Lässt einen Vulkan wachsen, der 15 Sekunden ausbricht",
+     "#2b2422", ("metal", "#3a302c"), "#ffe0b3", "eruption", {"a": "#5a4a44", "d": "#2a1e1b", "c": "#ff7a00", "b": "#ffd23a", "o": "#1a1211"},
+     "cracks", [T, "minecraft:magma_block", "minecraft:basalt", "minecraft:basalt"], ["#ffd23a", "#ff7a00", "#c23a00"])
+kind("staircase_tnt", "Staircase TNT", "Wendeltreppen-TNT", "A spiral staircase 48 blocks down", "Eine Wendeltreppe 48 Blöcke in die Tiefe",
+     "#8a8a8a", ("metal", "#5a5f66"), "#efe8d8", "stairs", {"a": "#7a7a7a", "b": "#b8b8b8"},
+     "bricks", [T, "minecraft:stone_brick_stairs", "minecraft:stone_brick_stairs"])
+kind("bunker_tnt", "Bunker TNT", "Bunker-TNT", "Carves a lit bunker under the TNT", "Gräbt einen beleuchteten Bunker unter das TNT",
+     "#5a6a4a", ("metal", "#3a3f44"), "#e8e4d4", "bunker", {"c": "#5fa83c", "d": "#7a5a3a", "a": "#8a8a8a", "b": "#ffd23a"},
+     "rivets", [T, "minecraft:iron_door"])
+kind("platform_tnt", "Platform TNT", "Plattform-TNT", "A 15×15 stone floor — over water, air or lava", "Eine 15×15-Steinfläche — über Wasser, Luft oder Lava",
+     "#9a9a9a", ("rope",), "#efe8d8", "platform", {"a": "#8a8a8a", "b": "#5a5a5a", "c": "#c8322f", "d": "#6b4a2a"},
+     "bricks", [T, "minecraft:stone_brick_slab", "minecraft:stone_brick_slab", "minecraft:stone_brick_slab"])
+kind("tower_tnt", "Tower TNT", "Turm-TNT", "A 24-block watchtower with ladder and battlements", "Ein 24 Blöcke hoher Wachturm mit Leiter und Zinnen",
+     "#707070", ("metal", "#4a4f55"), "#ece6d6", "tower", {"a": "#8f8f8f", "b": "#c9a06a", "d": "#2a2a2a"},
+     "bricks", [T, "minecraft:ladder", "minecraft:ladder", "minecraft:stone_bricks"])
+kind("curse_tnt", "Curse TNT", "Fluch-TNT", "Curses every creature nearby except you", "Verflucht alle Lebewesen in der Nähe außer dir",
+     "#3a1a4a", ("metal", "#2a1a30"), "#1a0e20", "broken", {"a": "#b04aff"},
+     "stars", [T, "minecraft:wither_rose"], ["#b04aff", "#5a1a8a"])
+kind("blessing_tnt", "Blessing TNT", "Segen-TNT", "Strength, speed, haste and more for every player nearby", "Stärke, Tempo, Eile und mehr für alle Spieler in der Nähe",
+     "#e8c25a", ("metal", "#c99a1a"), "#fffbe8", "sun", {"a": "#ffb300", "b": "#ff7a1a"},
+     "stars", [T, "minecraft:golden_apple"], ["#ffffff", "#fff2a8"])
+kind("stasis_tnt", "Stasis TNT", "Stasis-TNT", "Freezes every mob nearby for ten seconds", "Friert alle Mobs in der Nähe zehn Sekunden ein",
+     "#2a4a6a", ("metal", "#c8d6e0"), "#e8f4ff", "hourglass", {"a": "#2a4a6a", "b": "#7ad6ff"},
+     "stars", [T, "minecraft:clock"], ["#7ad6ff", "#c8f0ff"])
+kind("bee_tnt", "Bee TNT", "Bienen-TNT", "Eight bees that hunt the monsters around", "Acht Bienen, die die Monster ringsum jagen",
+     "#e8b81a", ("rope", "#3a2a10"), "#fffbe8", "bee", {"a": "#f2c21a", "d": "#1a1a1a", "b": "#dff6ff", "c": "#3a3a3a"},
+     "speck", [T, "minecraft:honeycomb", "minecraft:honeycomb"], ["#1a1a1a", "#a8800a"])
+kind("wolf_tnt", "Wolf Pack TNT", "Wolfsrudel-TNT", "Four wolves, tamed to you", "Vier Wölfe, die dir gehören",
+     "#8a8a8a", ("rope", "#c83a2a"), "#f2f2f2", "wolf", {"a": "#c8c8c8", "d": "#1a1a1a", "b": "#ffffff", "c": "#c83a2a"},
+     "moss", [T, "minecraft:bone", "minecraft:bone", "minecraft:bone"], ["#a8a8a8", "#6a6a6a"])
+kind("golem_tnt", "Golem TNT", "Golem-TNT", "Two iron golems guard the area", "Zwei Eisengolems bewachen die Gegend",
+     "#b8b0a4", ("metal", "#6a6a6a"), "#f2f0ea", "golem", {"a": "#c9c2b8", "b": "#e2dcd2", "d": "#8a1a1a", "c": "#9a9288", "v": "#4a8a2a"},
+     "moss", [T, "minecraft:iron_block", "minecraft:carved_pumpkin"], ["#4a8a2a", "#2f6a1a"])
+kind("flak_tnt", "Flak TNT", "Flak-TNT", "Shoots up 40 blocks and bursts — anti-air", "Schießt 40 Blöcke hoch und platzt — gegen Phantome",
+     "#4a5a3a", ("hazard",), "#e8e4d4", "rocket", {"a": "#8a949b", "b": "#2a2a2a", "c": "#ff7a1a"},
+     "rivets", [T, "minecraft:firework_rocket", "minecraft:gunpowder"])
+kind("halloween_tnt", "Halloween TNT", "Halloween-TNT", "A ring of jack o'lanterns and a cloud of bats", "Ein Ring aus Kürbislaternen und eine Wolke Fledermäuse",
+     "#2a1a2e", ("rope", "#e07a1a"), "#1a1018", "pumpkin", {"a": "#e07a1a", "d": "#ffd23a", "v": "#3a6a1a"},
+     "embers", [T, "minecraft:carved_pumpkin", "minecraft:torch"], ["#ff8a1a", "#8a3ad6"])
 
 assert len({k["id"] for k in K}) == len(K)
 assert len({tuple(sorted(k["recipe"])) for k in K}) == len(K), "two kinds share a recipe"

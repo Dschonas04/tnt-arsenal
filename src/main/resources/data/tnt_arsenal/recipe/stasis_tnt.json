@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:clock"
+  ],
+  "result": {
+    "id": "tnt_arsenal:stasis_tnt",
+    "count": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:stone_brick_slab",
+    "minecraft:stone_brick_slab",
+    "minecraft:stone_brick_slab"
+  ],
+  "result": {
+    "id": "tnt_arsenal:platform_tnt",
+    "count": 1
+  }
+}

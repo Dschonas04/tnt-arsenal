@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:magma_block",
+    "minecraft:basalt",
+    "minecraft:basalt"
+  ],
+  "result": {
+    "id": "tnt_arsenal:volcano_tnt",
+    "count": 1
+  }
+}

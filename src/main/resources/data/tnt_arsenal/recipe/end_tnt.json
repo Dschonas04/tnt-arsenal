@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:end_stone",
+    "minecraft:chorus_fruit"
+  ],
+  "result": {
+    "id": "tnt_arsenal:end_tnt",
+    "count": 1
+  }
+}

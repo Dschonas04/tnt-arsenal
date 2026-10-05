@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:sculk",
+    "minecraft:sculk"
+  ],
+  "result": {
+    "id": "tnt_arsenal:sculk_tnt",
+    "count": 1
+  }
+}

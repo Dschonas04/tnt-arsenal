@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:tnt",
+    "minecraft:golden_apple"
+  ],
+  "result": {
+    "id": "tnt_arsenal:blessing_tnt",
+    "count": 1
+  }
+}
