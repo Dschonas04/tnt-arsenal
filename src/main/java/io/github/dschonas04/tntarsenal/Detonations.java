@@ -141,7 +141,7 @@ final class Detonations {
 
     /** Plain ground: stone of every dimension, dirt, sand, gravel. */
     private static boolean ground(BlockState state) {
-        return state.is(BlockTags.BASE_STONE_OVERWORLD) || state.is(BlockTags.BASE_STONE_NETHER) || state.is(BlockTags.DIRT)
+        return state.is(BlockTags.BASE_STONE_OVERWORLD) || state.is(BlockTags.BASE_STONE_NETHER) || state.is(BlockTags.SUBSTRATE_OVERWORLD)
                 || state.is(BlockTags.SAND) || state.is(Blocks.GRAVEL) || state.is(Blocks.COBBLESTONE)
                 || state.is(Blocks.COBBLED_DEEPSLATE) || state.is(Blocks.CALCITE) || state.is(Blocks.CLAY)
                 || state.is(Blocks.DRIPSTONE_BLOCK) || state.is(Blocks.SMOOTH_BASALT) || state.is(Blocks.END_STONE)
@@ -240,37 +240,104 @@ final class Detonations {
     }
 
     /**
-     * A core blast and a ring of eight around it, so the crater comes out round
-     * instead of ragged, then a mushroom cloud that rises for three seconds.
+     * A real nuke. A flash of heat burns everything within 72 blocks, armour or
+     * not; a core blast and three rings of blasts tear the land open; a bowl-shaped
+     * crater 110 wide and 37 deep is carved out from the middle; the blast wave
+     * throws everything within 96 blocks outwards. Then a mushroom cloud rises, the land
+     * around is scorched and five minutes of fallout follow.
      */
     static void nuke(ServerLevel level, PrimedTnt t) {
         double x = t.getX();
         double y = y(t);
         double z = t.getZ();
-        level.explode(t, x, y, z, 20, true, Level.ExplosionInteraction.BLOCK);
+        Vec3 c = new Vec3(x, y, z);
+        BlockPos center = t.blockPosition();
+        LivingEntity owner = t.getOwner();
+        for (Entity entity : around(level, c, Entity.class, 96)) {
+            double dist = Math.sqrt(entity.distanceToSqr(c));
+            double near = 1 - dist / 96;
+            Vec3 away = entity.position().subtract(c);
+            Vec3 dir = away.lengthSqr() < 0.01 ? new Vec3(0, 1, 0) : away.normalize();
+            entity.setDeltaMovement(entity.getDeltaMovement().add(dir.scale(near * 3.5)).add(0, near * 1.2, 0));
+            entity.hurtMarked = true;
+            if (entity instanceof LivingEntity living && dist < 72) {
+                double heat = 1 - dist / 72;
+                living.hurtServer(level, level.damageSources().magic(), (float) (45 * heat * heat + 8 * heat));
+                if (heat > 0.3) living.igniteForSeconds(10);
+            }
+        }
+        level.explode(t, x, y, z, 28, true, Level.ExplosionInteraction.BLOCK);
         for (int i = 0; i < 8; i++) {
             double angle = Math.PI * 2 * i / 8;
-            level.explode(t, x + Math.cos(angle) * 10, y, z + Math.sin(angle) * 10, 10, true, Level.ExplosionInteraction.BLOCK);
+            level.explode(t, x + Math.cos(angle) * 14, y, z + Math.sin(angle) * 14, 14, true, Level.ExplosionInteraction.BLOCK);
         }
-        level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 16.0f, 0.5f);
-        scorch(level, t.blockPosition());
-        fallout(level, new Vec3(x, y, z));
+        for (int i = 0; i < 12; i++) {
+            double angle = Math.PI * 2 * i / 12 + 0.26;
+            level.explode(t, x + Math.cos(angle) * 30, y, z + Math.sin(angle) * 30, 12, true, Level.ExplosionInteraction.BLOCK);
+        }
+        for (int i = 0; i < 16; i++) {
+            double angle = Math.PI * 2 * i / 16;
+            level.explode(t, x + Math.cos(angle) * 48, y, z + Math.sin(angle) * 48, 9, true, Level.ExplosionInteraction.BLOCK);
+        }
+        level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 30.0f, 0.4f);
+        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, x, y + 4, z, 40, 14, 6, 14, 0);
+        // The crater: a flattened ball 110 wide and about 37 deep, carved from the
+        // middle outwards, one shell every other tick. Its chunks stay loaded until
+        // the land around is scorched, so it is finished even if everyone runs.
+        List<long[]> forced = new ArrayList<>();
+        for (int cx = (center.getX() - 72) >> 4; cx <= (center.getX() + 72) >> 4; cx++) {
+            for (int cz = (center.getZ() - 72) >> 4; cz <= (center.getZ() + 72) >> 4; cz++) {
+                if (level.setChunkForced(cx, cz, true)) forced.add(new long[]{cx, cz});
+            }
+        }
         Tasks.start(age -> {
-            double stem = Math.min(age, 40) * 0.75;
-            level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, y + stem, z, 12, 1.5, 1.0, 1.5, 0.01);
-            level.sendParticles(ParticleTypes.FLAME, x, y + stem * 0.5, z, 6, 1.2, stem * 0.3, 1.2, 0.02);
-            if (age >= 20) {
-                double cap = y + 30;
-                double spread = 4 + (age - 20) * 0.25;
-                level.sendParticles(ParticleTypes.LARGE_SMOKE, x, cap, z, 40, spread, 2.0, spread, 0.02);
-                level.sendParticles(ParticleTypes.EXPLOSION, x, cap, z, 2, spread, 1.5, spread, 0);
+            if (age % 2 != 0) return false;
+            int r = age / 2 + 1;
+            double outer = (double) r * r;
+            double inner = (r - 1.0) * (r - 1.0);
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    double flat = dx * dx + dz * dz;
+                    if (flat > outer) continue;
+                    // the dy that put this column inside the shell, with depth squashed by 1.5
+                    int top = (int) Math.floor(Math.sqrt((outer - flat) / 2.25));
+                    int bottom = flat >= inner ? 0 : (int) Math.ceil(Math.sqrt((inner - flat) / 2.25) + 1e-9);
+                    for (int dy = bottom; dy <= top; dy++) {
+                        for (int sign = (dy == 0 ? 1 : -1); sign <= 1; sign += 2) {
+                            BlockPos pos = center.offset(dx, dy * sign, dz);
+                            if (level.isLoaded(pos) && removable(level, pos, level.getBlockState(pos))) {
+                                level.setBlock(pos, Blocks.AIR.defaultBlockState(), QUIET);
+                            }
+                        }
+                    }
+                }
             }
-            if (age == 10 || age == 25) {
-                level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 12.0f, 0.4f);
+            if (r < 55) return false;
+            scorch(level, center, () -> {
+                for (long[] chunk : forced) level.setChunkForced((int) chunk[0], (int) chunk[1], false);
+            });
+            fallout(level, c);
+            return true;
+        });
+        // the mushroom cloud
+        Tasks.start(age -> {
+            double stem = Math.min(age, 50) * 1.0;
+            level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, y + stem, z, 20, 2.5, 1.5, 2.5, 0.01);
+            level.sendParticles(ParticleTypes.FLAME, x, y + stem * 0.5, z, 10, 2.0, stem * 0.3, 2.0, 0.02);
+            if (age >= 25) {
+                double cap = y + 50;
+                double spread = 6 + (age - 25) * 0.2;
+                level.sendParticles(ParticleTypes.LARGE_SMOKE, x, cap, z, 80, spread, 3.0, spread, 0.02);
+                level.sendParticles(ParticleTypes.EXPLOSION, x, cap, z, 4, spread, 2.0, spread, 0);
+                level.sendParticles(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, x, cap + 2, z, 30, spread * 0.8, 2.0, spread * 0.8, 0.01);
             }
-            return age >= 60;
+            if (age == 8 || age == 20 || age == 40) {
+                level.playSound(null, x, y, z, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 20.0f, 0.3f);
+            }
+            return age >= 100;
         });
     }
+
 
     /** A normal explosion that also sets the surroundings alight. */
     static void fire(ServerLevel level, PrimedTnt t) {
@@ -608,33 +675,105 @@ final class Detonations {
 
     // --- forces ----------------------------------------------------------
 
-    /** Pulls everything within 16 blocks in for two seconds, then explodes. */
+    /**
+     * Gravity: tears loose the blocks around it for one and a half seconds and
+     * pulls them, and every creature within 16 blocks, into a whirl above the
+     * TNT — then explodes and hurls the whole lot outwards.
+     */
     static void gravity(ServerLevel level, PrimedTnt t) {
         Vec3 c = t.position();
+        Vec3 eye = c.add(0, 4, 0);
+        RandomSource random = level.getRandom();
+        List<FallingBlockEntity> rubble = new ArrayList<>();
+        List<BlockPos> loose = new ArrayList<>(sphere(t.blockPosition(), 6));
+        sound(level, c, SoundEvents.BEACON_ACTIVATE, 3.0f, 0.7f);
         Tasks.start(age -> {
-            for (Entity entity : around(level, c, Entity.class, 16)) pull(entity, c, 0.35);
-            level.sendParticles(ParticleTypes.REVERSE_PORTAL, c.x, c.y + 1, c.z, 40, 6, 3, 6, 0.4);
-            if (age < 40) return false;
+            if (age < 30) tearLoose(level, loose, rubble, 8, random);
+            for (Entity entity : around(level, c, Entity.class, 16)) {
+                if (!(entity instanceof FallingBlockEntity)) pull(entity, c, 0.35);
+            }
+            for (FallingBlockEntity block : rubble) {
+                if (!block.isAlive()) continue;
+                Vec3 to = eye.subtract(block.position());
+                Vec3 swirl = new Vec3(-to.z, 0, to.x).normalize().scale(0.25);
+                block.setDeltaMovement(to.scale(0.12).add(swirl));
+                block.time = 1;
+                block.hurtMarked = true;
+            }
+            level.sendParticles(ParticleTypes.REVERSE_PORTAL, eye.x, eye.y, eye.z, 40, 4, 3, 4, 0.4);
+            if (age < 50) return false;
             level.explode(t, c.x, c.y, c.z, 5, false, Level.ExplosionInteraction.TNT);
+            for (FallingBlockEntity block : rubble) {
+                if (!block.isAlive()) continue;
+                Vec3 out = block.position().subtract(c).multiply(1, 0, 1);
+                Vec3 dir = out.lengthSqr() < 0.01 ? new Vec3(random.nextDouble() - 0.5, 0, random.nextDouble() - 0.5).normalize() : out.normalize();
+                block.setNoGravity(false);
+                block.setDeltaMovement(dir.scale(1.0 + random.nextDouble() * 1.2).add(0, 0.6 + random.nextDouble() * 0.7, 0));
+                block.hurtMarked = true;
+            }
             return true;
         });
     }
 
     /**
-     * Five seconds of vortex: pulls everything within 24 blocks, hurts what it
-     * catches, then collapses and swallows a ball of blocks fifteen wide.
+     * Turns up to {@code count} exposed blocks from the list into weightless
+     * falling blocks. Only blocks with air above come loose, so the ground is
+     * peeled away from the top and nothing gets stuck inside the earth.
+     */
+    private static void tearLoose(ServerLevel level, List<BlockPos> loose, List<FallingBlockEntity> rubble, int count, RandomSource random) {
+        int taken = 0;
+        for (int tries = 0; tries < 60 && taken < count && !loose.isEmpty(); tries++) {
+            BlockPos pos = loose.remove(random.nextInt(loose.size()));
+            BlockState state = level.getBlockState(pos);
+            if (!removable(level, pos, state) || !state.getFluidState().isEmpty()
+                    || !state.isCollisionShapeFullBlock(level, pos) || !level.getBlockState(pos.above()).isAir()) {
+                if (!state.isAir() && removable(level, pos, state)) loose.add(pos); // try again once it is exposed
+                continue;
+            }
+            FallingBlockEntity block = FallingBlockEntity.fall(level, pos, state);
+            block.setNoGravity(true);
+            block.setHurtsEntities(1.0f, 10);
+            block.setDeltaMovement(0, 0.4, 0);
+            rubble.add(block);
+            taken++;
+        }
+    }
+
+
+    /**
+     * Five seconds of vortex: pulls everything within 24 blocks, tears the
+     * ground loose and swallows it block by block, hurts what it catches, then
+     * collapses and swallows a ball of blocks fifteen wide.
      */
     static void blackHole(ServerLevel level, PrimedTnt t) {
-        Vec3 c = t.position().add(0, 0.5, 0);
+        Vec3 c = t.position().add(0, 2.5, 0);
         BlockPos center = t.blockPosition();
+        RandomSource random = level.getRandom();
+        List<FallingBlockEntity> rubble = new ArrayList<>();
+        List<BlockPos> loose = new ArrayList<>(sphere(center, 10));
         sound(level, c, SoundEvents.BEACON_ACTIVATE, 4.0f, 0.5f);
         Tasks.start(age -> {
             double strength = 0.15 + age * 0.003;
+            if (age < 90) tearLoose(level, loose, rubble, 6, random);
             for (Entity entity : around(level, c, Entity.class, 24)) {
+                if (entity instanceof FallingBlockEntity) continue;
                 pull(entity, c, strength);
                 if (age % 10 == 0 && entity instanceof LivingEntity living && living.distanceToSqr(c) < 4) {
                     living.hurtServer(level, level.damageSources().magic(), 3);
                 }
+            }
+            for (FallingBlockEntity block : rubble) {
+                if (!block.isAlive()) continue;
+                Vec3 to = c.subtract(block.position());
+                if (to.lengthSqr() < 1.5) {
+                    level.sendParticles(ParticleTypes.SQUID_INK, block.getX(), block.getY(), block.getZ(), 4, 0.2, 0.2, 0.2, 0.01);
+                    block.discard();
+                    continue;
+                }
+                Vec3 swirl = new Vec3(-to.z, 0, to.x).normalize().scale(0.3);
+                block.setDeltaMovement(to.normalize().scale(0.25 + age * 0.004).add(swirl));
+                block.time = 1;
+                block.hurtMarked = true;
             }
             for (int arm = 0; arm < 4; arm++) {
                 double angle = age * 0.35 + arm * Math.PI / 2;
@@ -644,6 +783,7 @@ final class Detonations {
             level.sendParticles(ParticleTypes.SQUID_INK, c.x, c.y, c.z, 6, 0.4, 0.4, 0.4, 0.01);
             if (age % 20 == 0) sound(level, c, SoundEvents.PORTAL_AMBIENT, 3.0f, 0.5f);
             if (age < 100) return false;
+            for (FallingBlockEntity block : rubble) block.discard();
             for (BlockPos pos : sphere(center, 7)) {
                 if (level.isLoaded(pos) && removable(level, pos, level.getBlockState(pos))) {
                     level.setBlock(pos, Blocks.AIR.defaultBlockState(), QUIET);
@@ -654,6 +794,7 @@ final class Detonations {
             return true;
         });
     }
+
 
     /**
      * Wipes a ball of blocks twenty wide out of existence, from the inside
@@ -1018,7 +1159,7 @@ final class Detonations {
             BlockState into = null;
             if (state.is(Blocks.GRASS_BLOCK)) {
                 into = Blocks.CRIMSON_NYLIUM.defaultBlockState();
-            } else if (state.is(BlockTags.DIRT)) {
+            } else if (state.is(BlockTags.SUBSTRATE_OVERWORLD)) {
                 into = Blocks.SOUL_SOIL.defaultBlockState();
             } else if (state.is(BlockTags.SAND)) {
                 into = Blocks.SOUL_SAND.defaultBlockState();
@@ -1166,18 +1307,18 @@ final class Detonations {
     // --- the nuke's aftermath ----------------------------------------------
 
     /**
-     * Scorched earth around ground zero, one layer per tick: grass turns to
-     * coarse dirt, leaves and plants burn away, and the crater floor within 14
-     * blocks glazes over with blackstone and glowing magma.
+     * Scorched earth around ground zero, one layer per tick: within 70 blocks
+     * grass turns to coarse dirt and leaves and plants burn away; the crater
+     * and its rim within 60 blocks glaze over with blackstone and glowing magma.
      */
-    private static void scorch(ServerLevel level, BlockPos center) {
+    private static void scorch(ServerLevel level, BlockPos center, Runnable done) {
         RandomSource random = level.getRandom();
         Tasks.start(age -> {
-            int dy = 14 - age;
-            for (int dx = -30; dx <= 30; dx++) {
-                for (int dz = -30; dz <= 30; dz++) {
+            int dy = 24 - age;
+            for (int dx = -70; dx <= 70; dx++) {
+                for (int dz = -70; dz <= 70; dz++) {
                     int d = dx * dx + dz * dz;
-                    if (d > 900) continue;
+                    if (d > 4900) continue;
                     BlockPos pos = center.offset(dx, dy, dz);
                     if (!level.isLoaded(pos)) continue;
                     BlockState state = level.getBlockState(pos);
@@ -1187,9 +1328,9 @@ final class Detonations {
                     if (state.is(BlockTags.LEAVES) || state.is(Blocks.SNOW)) {
                         into = Blocks.AIR.defaultBlockState();
                     } else if (state.canBeReplaced() && state.getFluidState().isEmpty()) {
-                        into = random.nextFloat() < 0.15f && level.getBlockState(pos.below()).is(BlockTags.DIRT)
+                        into = random.nextFloat() < 0.15f && level.getBlockState(pos.below()).is(BlockTags.SUBSTRATE_OVERWORLD)
                                 ? Blocks.DEAD_BUSH.defaultBlockState() : Blocks.AIR.defaultBlockState();
-                    } else if (open && d <= 196 && ground(state)) {
+                    } else if (open && d <= 3600 && ground(state)) {
                         float roll = random.nextFloat();
                         into = roll < 0.08f ? Blocks.MAGMA_BLOCK.defaultBlockState()
                                 : roll < 0.4f ? Blocks.BLACKSTONE.defaultBlockState() : null;
@@ -1199,13 +1340,15 @@ final class Detonations {
                     if (into != null) level.setBlock(pos, into, QUIET);
                 }
             }
-            return dy <= -8;
+            if (dy > -40) return false;
+            done.run();
+            return true;
         });
     }
 
     /**
-     * Fallout: three minutes of radiation within 48 blocks. Everyone inside is
-     * poisoned, starved and weakened; within 24 blocks the wither sets in. Green
+     * Fallout: five minutes of radiation within 96 blocks. Everyone inside is
+     * poisoned, starved and weakened; within 48 blocks the wither sets in. Green
      * motes drift over the zone and a Geiger counter ticks for every player in
      * it — faster the closer they are. Milk helps for a moment; leaving helps.
      */
@@ -1214,12 +1357,12 @@ final class Detonations {
         RandomSource random = level.getRandom();
         Tasks.start(age -> {
             if (age % 4 == 0) {
-                level.sendParticles(glow, c.x, c.y + 3, c.z, 40, 22, 4, 22, 0);
-                level.sendParticles(ParticleTypes.WHITE_ASH, c.x, c.y + 10, c.z, 60, 26, 8, 26, 0);
+                level.sendParticles(glow, c.x, c.y + 3, c.z, 120, 45, 6, 45, 0);
+                level.sendParticles(ParticleTypes.WHITE_ASH, c.x, c.y + 10, c.z, 150, 55, 12, 55, 0);
             }
-            for (LivingEntity entity : around(level, c, LivingEntity.class, 48)) {
+            for (LivingEntity entity : around(level, c, LivingEntity.class, 96)) {
                 double dist = Math.sqrt(entity.distanceToSqr(c));
-                boolean hot = dist < 24;
+                boolean hot = dist < 48;
                 if (age % 20 == 0) {
                     entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, hot ? 1 : 0));
                     entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 60, 1));
@@ -1234,7 +1377,7 @@ final class Detonations {
                             SoundSource.AMBIENT, 0.5f, 1.6f + random.nextFloat() * 0.4f);
                 }
             }
-            return age >= 3600;
+            return age >= 6000;
         });
     }
 
@@ -1275,7 +1418,7 @@ final class Detonations {
             BlockState state = level.getBlockState(pos);
             if (!removable(level, pos, state)) continue;
             BlockState into = null;
-            if (state.is(BlockTags.DIRT) || state.is(Blocks.GRAVEL)) {
+            if (state.is(BlockTags.SUBSTRATE_OVERWORLD) || state.is(Blocks.GRAVEL)) {
                 into = (level.getBlockState(pos.above()).canBeReplaced() ? Blocks.SAND : Blocks.SANDSTONE).defaultBlockState();
             } else if (state.is(BlockTags.BASE_STONE_OVERWORLD)) {
                 into = Blocks.SANDSTONE.defaultBlockState();

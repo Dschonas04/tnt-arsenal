@@ -10,7 +10,7 @@ so **JEI and REI show every recipe**.
 |---|---|---|
 | Mega TNT | twice the power of TNT | 4 × TNT |
 | Giga TNT | four times the power of TNT | 4 × Mega TNT + blaze powder |
-| Nuke TNT | round crater, mushroom cloud, scorched land and three minutes of radiation | 4 × Giga TNT + nether star |
+| Nuke TNT | heat flash, a crater 110 wide, blast wave, mushroom cloud and five minutes of fallout | 4 × Giga TNT + nether star |
 | Fire TNT | sets everything around alight | TNT + fire charge |
 | Lightning TNT | a ring of lightning | TNT + lightning rod |
 | Cluster TNT | bursts into eight TNT | 3 × TNT + 2 × gunpowder |
@@ -22,12 +22,12 @@ so **JEI and REI show every recipe**.
 | Lava TNT | fills its crater with lava | TNT + lava bucket |
 | Frost TNT | freezes water, lava and creatures | TNT + packed ice + snowball |
 | Poison TNT | leaves a cloud of poison | TNT + fermented spider eye |
-| Gravity TNT | pulls everything in for two seconds, then bang | TNT + iron block |
+| Gravity TNT | tears the ground loose, whirls it up and hurls it away | TNT + iron block |
 | Ender TNT | scatters everyone nearby | TNT + ender pearl |
 | Bounce TNT | launches everything into the air, soft landing | TNT + slime ball |
 | Firework TNT | real fireworks, no damage | TNT + firework rocket |
 | Healing TNT | heals and cures poison and wither | TNT + glistering melon slice |
-| Black Hole TNT | swallows everything for five seconds, then the blocks | Gravity TNT + ender eye + crying obsidian |
+| Black Hole TNT | five seconds of vortex that swallows creatures and blocks | Gravity TNT + ender eye + crying obsidian |
 | Antigravity TNT | blocks and creatures float up | TNT + phantom membrane + feather |
 | Bridge TNT | builds a 40-block stone bridge the way you face | TNT + 4 × stone bricks |
 | Wall TNT | raises a round castle wall | TNT + 2 × cobblestone wall |
@@ -76,14 +76,17 @@ faced when placing the block.
 
 ## The nuke
 
-The nuke is meant to be one. A core blast and a ring of eight around it leave a
-round crater; a mushroom cloud rises over it. Within thirty blocks the land is
+The nuke is meant to be one — and a nether star is worth it. A flash of heat
+burns everything within 72 blocks, armour or not; a core blast and three rings of
+blasts tear the land open; a bowl-shaped crater **110 blocks wide and about 37
+deep** is carved out from the middle; the blast wave throws everything within 96
+blocks outwards. A mushroom cloud rises 50 blocks. Within 70 blocks the land is
 scorched — grass turns to coarse dirt, leaves and plants burn away, the crater
-floor glazes over with blackstone and glowing magma. Then the fallout: for three
-minutes everyone within 48 blocks is poisoned, starved and weakened, and within
-24 blocks the wither sets in. Green motes drift over the zone, and every player
-inside hears a Geiger counter that ticks faster the closer they are. Milk helps
-for a moment; leaving helps for good.
+and its rim glaze over with blackstone and glowing magma. Then the fallout: for
+five minutes everyone within 96 blocks is poisoned, starved and weakened, and
+within 48 blocks the wither sets in. Green motes drift over the zone, and every
+player inside hears a Geiger counter that ticks faster the closer they are. The
+crater's chunks stay loaded until it is finished, even if everyone runs.
 
 ## What is never touched
 

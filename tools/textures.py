@@ -186,7 +186,7 @@ kind("mega_tnt", "Mega TNT", "Mega-TNT", "Twice the power of TNT", "Doppelte Spr
 kind("giga_tnt", "Giga TNT", "Giga-TNT", "Four times the power of TNT", "Vierfache Sprengkraft",
      "#8d1a1a", ("metal", "#8a8f96"), "#f1e6c8", "burst", {"a": "#ff7a1a", "b": "#fff2a8", "c": "#c81e1e"},
      "rivets", ["tnt_arsenal:mega_tnt"] * 4 + ["minecraft:blaze_powder"])
-kind("nuke_tnt", "Nuke TNT", "Atom-TNT", "Round crater, mushroom cloud, scorched land and three minutes of radiation", "Runder Krater, Atompilz, verbrannte Erde und drei Minuten Strahlung",
+kind("nuke_tnt", "Nuke TNT", "Atom-TNT", "Heat flash, a crater 110 wide, blast wave, mushroom cloud and five minutes of fallout", "Hitzeblitz, 110 Blöcke breiter Krater, Druckwelle, Atompilz und fünf Minuten Fallout",
      "#4a5320", ("hazard",), "#f2c81b", "trefoil", {"a": "#1a1a1a"},
      "rivets", ["tnt_arsenal:giga_tnt"] * 4 + ["minecraft:nether_star"])
 kind("fire_tnt", "Fire TNT", "Feuer-TNT", "Sets everything around alight", "Setzt die Umgebung in Brand",
@@ -222,7 +222,7 @@ kind("frost_tnt", "Frost TNT", "Frost-TNT", "Freezes water, lava and creatures",
 kind("poison_tnt", "Poison TNT", "Gift-TNT", "Leaves a cloud of poison", "Hinterlässt eine Giftwolke",
      "#4e8a2a", ("rope", "#5a4a2a"), "#d8efc0", "skull", {"a": "#f2f2e4", "d": "#1f3d10"},
      "drip", [T, "minecraft:fermented_spider_eye"], ["#b4ff4a", "#7ad62a"])
-kind("gravity_tnt", "Gravity TNT", "Schwerkraft-TNT", "Pulls everything in for two seconds, then bang", "Zieht zwei Sekunden lang alles heran, dann Knall",
+kind("gravity_tnt", "Gravity TNT", "Schwerkraft-TNT", "Tears the ground loose, whirls it up and hurls it away", "Reißt Blöcke los, wirbelt sie hoch und schleudert sie weg",
      "#4b2a6b", ("metal", "#8a8f96"), "#e6daf2", "pull", {"a": "#3a1a5a", "b": "#b06cff"},
      "stars", [T, "minecraft:iron_block"], ["#c9a0ff", "#8a5ad6"])
 kind("ender_tnt", "Ender TNT", "Ender-TNT", "Scatters everyone nearby", "Teleportiert alle in der Nähe weg",
@@ -237,7 +237,7 @@ kind("firework_tnt", "Firework TNT", "Feuerwerk-TNT", "Real fireworks, no damage
 kind("healing_tnt", "Healing TNT", "Heil-TNT", "Heals and cures poison and wither", "Heilt und entfernt Gift und Wither",
      "#e84a8a", ("metal", "#e8c24a"), "#ffffff", "heart", {"a": "#d81b60", "b": "#ff9ec2"},
      "stars", [T, "minecraft:glistering_melon_slice"], ["#ffffff", "#ffd0e2"])
-kind("black_hole_tnt", "Black Hole TNT", "Schwarzes-Loch-TNT", "Swallows everything for five seconds, then the blocks", "Saugt fünf Sekunden alles ein und verschluckt Blöcke",
+kind("black_hole_tnt", "Black Hole TNT", "Schwarzes-Loch-TNT", "Five seconds of vortex that swallows creatures and blocks", "Fünf Sekunden Sog, der Lebewesen und Blöcke verschluckt",
      "#140b1f", ("metal", "#3a3348"), "#2a1840", "hole", {"c": "#9b5cff", "b": "#e6d2ff", "d": "#3b1d66", "o": "#020104"},
      "stars", ["tnt_arsenal:gravity_tnt", "minecraft:ender_eye", "minecraft:crying_obsidian"], ["#ffffff", "#b07cff", "#6a3ad6"])
 kind("antigravity_tnt", "Antigravity TNT", "Antigravitations-TNT", "Blocks and creatures float up", "Lässt Blöcke und Lebewesen aufsteigen",
