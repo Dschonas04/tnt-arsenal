@@ -13,6 +13,8 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import io.github.dschonas04.tntarsenal.nuclear.item.DetonatorItem;
 import io.github.dschonas04.tntarsenal.nuclear.item.GeigerCounter;
 import java.util.ArrayList;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,13 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.github.dschonas04.tntarsenal.nuclear.alarm.SirenBlock;
+import io.github.dschonas04.tntarsenal.nuclear.item.TimerItem;
+import io.github.dschonas04.tntarsenal.nuclear.mob.IrradiatedZombies;
+import io.github.dschonas04.tntarsenal.nuclear.protection.Protection;
+import net.minecraft.world.item.DoubleHighBlockItem;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 
 /** Registers the bombs, the lit bomb entity, the detonator and the creative tab. */
 public final class NuclearTnt implements ModInitializer {
@@ -52,10 +61,34 @@ public final class NuclearTnt implements ModInitializer {
     public static EntityType<PrimedNuke> PRIMED_NUKE;
     public static Item DETONATOR;
     public static Item GEIGER_COUNTER;
+    public static Item TIMER;
+    public static Block SIREN;
+    public static Block BUNKER_DOOR;
     public static Block CHARRED_LOG;
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    /** Registers an item under the mod's name and puts it into the creative tab. */
+    public static <T extends Item> T item(String path, Function<Item.Properties, T> make, Item.Properties properties) {
+        ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id(path));
+        T item = Registry.register(BuiltInRegistries.ITEM, key, make.apply(properties.setId(key)));
+        ITEMS.add(item);
+        return item;
+    }
+
+    /** Registers a block and its item. */
+    public static <T extends Block> T block(String path, Function<BlockBehaviour.Properties, T> make, BlockBehaviour.Properties properties) {
+        return block(path, make, properties, BlockItem::new);
+    }
+
+    public static <T extends Block> T block(String path, Function<BlockBehaviour.Properties, T> make, BlockBehaviour.Properties properties,
+                                            BiFunction<Block, Item.Properties, Item> itemMaker) {
+        ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, id(path));
+        T block = Registry.register(BuiltInRegistries.BLOCK, key, make.apply(properties.setId(key)));
+        item(path, p -> itemMaker.apply(block, p), new Item.Properties().useBlockDescriptionPrefix());
+        return block;
     }
 
     @Override
@@ -106,6 +139,16 @@ public final class NuclearTnt implements ModInitializer {
                                 Component.translatable("item.tnt_arsenal.geiger_counter.desc").withStyle(ChatFormatting.GRAY))))));
         ITEMS.add(GEIGER_COUNTER);
         GeigerCounter.register();
+
+        TIMER = item("timer", TimerItem::new, new Item.Properties().stacksTo(16)
+                .component(DataComponents.LORE, new ItemLore(List.of(
+                        Component.translatable("item.tnt_arsenal.timer.desc").withStyle(ChatFormatting.GRAY)))));
+        SIREN = block("siren", SirenBlock::new, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(3f, 6f));
+        BUNKER_DOOR = block("bunker_door", p -> new DoorBlock(BlockSetType.COPPER, p) {
+                }, BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_DOOR).strength(10f, 1200f).noOcclusion(),
+                DoubleHighBlockItem::new);
+        Protection.register();
+        IrradiatedZombies.register();
         Contamination.register();
 
         ResourceKey<CreativeModeTab> tabKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, id("nuclear"));

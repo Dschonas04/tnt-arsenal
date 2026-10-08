@@ -1,0 +1,36 @@
+{
+  "criteria": {
+    "suit": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "tnt_arsenal:hazmat_helmet"
+          },
+          {
+            "items": "tnt_arsenal:hazmat_suit"
+          },
+          {
+            "items": "tnt_arsenal:hazmat_leggings"
+          },
+          {
+            "items": "tnt_arsenal:hazmat_boots"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:hazmat_helmet"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.hazmat.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.hazmat.description"
+    },
+    "frame": "goal"
+  },
+  "parent": "tnt_arsenal:nuclear/geiger"
+}

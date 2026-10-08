@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:dried_kelp",
+    "minecraft:dried_kelp",
+    "minecraft:sugar",
+    "minecraft:paper"
+  ],
+  "result": {
+    "id": "tnt_arsenal:iodine_tablets",
+    "count": 4
+  }
+}

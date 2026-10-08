@@ -6,6 +6,23 @@ All notable changes to TNT Arsenal. The format follows
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-08
+
+### Added
+- Iodine tablets (an iodine effect that halves the dose taken in), RadAway
+  (-200 mSv), a four-piece hazmat suit (a fifth per piece, 90 % as a set) and
+  lead blocks that shield four times as well as stone.
+- Irradiated zombies: zombies in contaminated land turn tougher and faster,
+  and every hit adds 25 mSv.
+- Timer fuse with 10 s to 5 min and a countdown above the hotbar.
+- Siren block, and a siren over every lit bomb while its fuse burns.
+- EMP: detonators, timer fuses and Geiger counters go dead for a minute,
+  lamps and copper bulbs go out.
+- Fallout rain after every detonation; standing in it doubles the intake.
+- Bunker door made of lead.
+- Eight advancements in a tab "TNT Arsenal: Nuclear".
+- `/nuclear config [key value]` lists and changes the settings.
+
 ## [1.3.1] - 2026-10-08
 
 ### Fixed

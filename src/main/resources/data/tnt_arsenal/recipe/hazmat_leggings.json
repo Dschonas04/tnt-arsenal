@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "LYL",
+    "L L",
+    "L L"
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "Y": "minecraft:yellow_dye"
+  },
+  "result": {
+    "id": "tnt_arsenal:hazmat_leggings",
+    "count": 1
+  }
+}

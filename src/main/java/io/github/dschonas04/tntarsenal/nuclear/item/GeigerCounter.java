@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * The Geiger counter. Held in either hand it reads the dose rate where the player
@@ -35,7 +36,11 @@ public final class GeigerCounter {
     }
 
     private static boolean holds(ServerPlayer player) {
-        return player.getMainHandItem().is(NuclearTnt.GEIGER_COUNTER) || player.getOffhandItem().is(NuclearTnt.GEIGER_COUNTER);
+        // A counter knocked out by an EMP is on cooldown and stays silent.
+        for (ItemStack stack : new ItemStack[] {player.getMainHandItem(), player.getOffhandItem()}) {
+            if (stack.is(NuclearTnt.GEIGER_COUNTER) && !player.getCooldowns().isOnCooldown(stack)) return true;
+        }
+        return false;
     }
 
     /** Background radiation clicks now and then; a hot zone turns it into a rattle. */

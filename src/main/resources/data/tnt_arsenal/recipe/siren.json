@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " N ",
+    "IRI",
+    "III"
+  ],
+  "key": {
+    "N": "minecraft:note_block",
+    "R": "minecraft:redstone",
+    "I": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "tnt_arsenal:siren",
+    "count": 1
+  }
+}

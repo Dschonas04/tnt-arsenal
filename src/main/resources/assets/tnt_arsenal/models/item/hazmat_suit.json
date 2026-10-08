@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "tnt_arsenal:item/hazmat_suit"
+  }
+}

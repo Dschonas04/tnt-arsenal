@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "LL",
+    "LL",
+    "LL"
+  ],
+  "key": {
+    "L": "tnt_arsenal:lead_block"
+  },
+  "result": {
+    "id": "tnt_arsenal:bunker_door",
+    "count": 3
+  }
+}

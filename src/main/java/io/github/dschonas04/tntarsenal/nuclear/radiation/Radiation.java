@@ -1,7 +1,9 @@
 package io.github.dschonas04.tntarsenal.nuclear.radiation;
 
 import io.github.dschonas04.tntarsenal.nuclear.NuclearTnt;
+import io.github.dschonas04.tntarsenal.nuclear.Achievements;
 import io.github.dschonas04.tntarsenal.nuclear.config.NukeConfig;
+import io.github.dschonas04.tntarsenal.nuclear.protection.Protection;
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
@@ -20,6 +22,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import com.mojang.serialization.Codec;
 
@@ -132,7 +135,9 @@ public final class Radiation {
         float factor = 1f;
         for (int dy = 1; dy <= 12; dy++) {
             BlockPos pos = head.above(dy);
-            if (level.getBlockState(pos).isCollisionShapeFullBlock(level, pos)) factor *= 0.7f;
+            BlockState state = level.getBlockState(pos);
+            if (state.is(Protection.LEAD_BLOCK)) factor *= 0.25f;
+            else if (state.isCollisionShapeFullBlock(level, pos)) factor *= 0.7f;
         }
         if (player.isUnderWater()) factor *= 0.5f;
         return factor;
@@ -140,11 +145,15 @@ public final class Radiation {
 
     private static void expose(ServerLevel level, ServerPlayer player) {
         if (player.isCreative() || player.isSpectator()) return;
-        float rate = rateAt(level, player.blockPosition()) * shielding(level, player);
+        float rate = rateAt(level, player.blockPosition()) * shielding(level, player) * Protection.factor(player);
+        // Fallout rain washes the dust down on whoever stands in it.
+        if (rate > 0.001f && level.isRainingAt(player.blockPosition().above())) rate *= 2f;
         float dose = dose(player);
         if (rate > 0.001f) dose += rate;
         else dose = Math.max(0f, dose - 0.2f);
         setDose(player, dose);
+        if (dose >= 500) Achievements.award(player, "survivor");
+        if (dose >= 1000) Achievements.award(player, "glowing");
         if (dose >= 100 && player.getRandom().nextFloat() < 0.15f) {
             player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
         }

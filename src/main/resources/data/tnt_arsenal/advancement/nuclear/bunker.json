@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "door": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "tnt_arsenal:bunker_door"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:bunker_door"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.bunker.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.bunker.description"
+    },
+    "frame": "task"
+  },
+  "parent": "tnt_arsenal:nuclear/root"
+}

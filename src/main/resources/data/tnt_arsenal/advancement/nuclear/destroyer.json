@@ -1,0 +1,20 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:tsar_bomba"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.destroyer.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.destroyer.description"
+    },
+    "frame": "challenge"
+  },
+  "parent": "tnt_arsenal:nuclear/root"
+}

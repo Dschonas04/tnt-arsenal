@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "tnt_arsenal:block/siren_side",
+    "end": "tnt_arsenal:block/siren_top"
+  }
+}

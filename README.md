@@ -117,8 +117,28 @@ called *TNT Arsenal: Nuclear*:
   The nuke from the sixty kinds leaves the same radiation, so the counter reads
   its crater too.
 
-`/nuclear radiation <pos>`, `/nuclear dose <player> [set <mSv>]` and
-`/nuclear count <block> <radius>` are for operators. Settings live in
+- **Protection.** Iodine tablets halve what the body takes in for ten
+  minutes; RadAway washes 200 mSv out at once. Every piece of the hazmat suit
+  keeps a fifth out, the whole suit 90 %. Lead blocks overhead shield four
+  times as well as stone.
+- **Fallout rain.** After a detonation it rains, longer the bigger the bomb;
+  whoever stands in it in contaminated land takes in twice as much.
+- **Irradiated zombies.** Zombies in contaminated land turn tougher, faster
+  and harder hitting, glow green, and every hit adds 25 mSv.
+- **Timer fuse.** Sneak and right-click to set 10 s to 5 minutes, right-click
+  a bomb to start the countdown, shown to everyone within 64 blocks.
+- **Siren.** A siren block wails while it gets a redstone signal; every lit
+  bomb sounds the siren over 256 blocks for as long as its fuse burns.
+- **EMP.** A detonation knocks out detonators, timer fuses and Geiger counters
+  within twice its radius for a minute and puts out redstone lamps and copper
+  bulbs.
+- **Bunker door.** A door made of lead that withstands even the crater's edge.
+- **Advancements** in a tab of their own, from *Tick, Tick, Tick* to *Now I Am
+  Become Death*.
+
+`/nuclear radiation <pos>`, `/nuclear dose <player> [set <mSv>]`,
+`/nuclear count <block> <radius>` and `/nuclear config [key value]` are for
+operators; the last one lists or changes a setting and saves it to
 `config/tnt_arsenal-nuclear.json`.
 
 ## What is never touched

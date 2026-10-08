@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "III",
+    "IOI",
+    "III"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "O": "minecraft:obsidian"
+  },
+  "result": {
+    "id": "tnt_arsenal:lead_block",
+    "count": 4
+  }
+}

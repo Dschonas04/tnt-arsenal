@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "L L",
+    "LYL",
+    "LLL"
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "Y": "minecraft:yellow_dye"
+  },
+  "result": {
+    "id": "tnt_arsenal:hazmat_suit",
+    "count": 1
+  }
+}

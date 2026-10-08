@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:fallout"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.glowing.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.glowing.description"
+    },
+    "frame": "challenge",
+    "hidden": true
+  },
+  "parent": "tnt_arsenal:nuclear/survivor"
+}

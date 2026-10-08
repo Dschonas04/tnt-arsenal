@@ -303,6 +303,8 @@ def main():
     lang_de["item.tnt_arsenal.geiger_counter.desc"] = "In einer Hand gehalten: zeigt Dosisleistung und deine Dosis an und knackt"
     lang_en["item.tnt_arsenal.geiger_counter.reading"] = "☢ %s mSv/s · dose %s mSv"
     lang_de["item.tnt_arsenal.geiger_counter.reading"] = "☢ %s mSv/s · Dosis %s mSv"
+    import nuclear_phase67
+    nuclear_phase67.generate(ROOT, NS, write_json, lang_en, lang_de)
     for code, extra in (("en_us", lang_en), ("de_de", lang_de)):
         path = f"{ROOT}/assets/{NS}/lang/{code}.json"
         with open(path, encoding="utf-8") as f:

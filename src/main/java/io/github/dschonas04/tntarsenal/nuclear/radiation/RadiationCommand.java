@@ -3,6 +3,9 @@ package io.github.dschonas04.tntarsenal.nuclear.radiation;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import io.github.dschonas04.tntarsenal.nuclear.config.NukeConfig;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.world.level.block.Block;
@@ -17,6 +20,7 @@ import net.minecraft.server.level.ServerPlayer;
  * {@code /nuclear radiation <pos>} shows the dose rate of a chunk,
  * {@code /nuclear dose <player> [set <mSv>]} shows or sets a player's dose.
  * {@code /nuclear count <block> <radius>} counts a block around the caller, 40 blocks up and down.
+ * {@code /nuclear config [key value]} lists or changes a setting and saves it.
  * For operators.
  */
 public final class RadiationCommand {
@@ -45,6 +49,22 @@ public final class RadiationCommand {
                                     int found = count;
                                     c.getSource().sendSuccess(() -> Component.literal(found + " x " + block.getName().getString()), false);
                                     return found;
+                                }))))
+                        .then(Commands.literal("config").executes(c -> {
+                            NukeConfig.values().forEach((k, v) -> c.getSource().sendSuccess(() -> Component.literal(k + " = " + v), false));
+                            return 1;
+                        }).then(Commands.argument("key", StringArgumentType.word())
+                                .suggests((c, b) -> SharedSuggestionProvider.suggest(NukeConfig.values().keySet(), b))
+                                .then(Commands.argument("value", StringArgumentType.word()).executes(c -> {
+                                    String key = StringArgumentType.getString(c, "key");
+                                    String value = StringArgumentType.getString(c, "value");
+                                    String error = NukeConfig.set(key, value);
+                                    if (error != null) {
+                                        c.getSource().sendFailure(Component.literal(key + ": " + error));
+                                        return 0;
+                                    }
+                                    c.getSource().sendSuccess(() -> Component.literal(key + " = " + NukeConfig.values().get(key)), true);
+                                    return 1;
                                 }))))
                         .then(Commands.literal("radiation").then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(c -> {
                             ServerLevel level = c.getSource().getLevel();

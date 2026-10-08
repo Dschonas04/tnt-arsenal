@@ -1,0 +1,20 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:rad_away"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.survivor.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.survivor.description"
+    },
+    "frame": "goal"
+  },
+  "parent": "tnt_arsenal:nuclear/geiger"
+}

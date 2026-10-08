@@ -1,0 +1,56 @@
+{
+  "criteria": {
+    "mini": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "tnt_arsenal:mini_nuke"
+          }
+        ]
+      }
+    },
+    "nuke": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "tnt_arsenal:nuke"
+          }
+        ]
+      }
+    },
+    "tsar": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "tnt_arsenal:tsar_bomba"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:tsar_bomba"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.root.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.root.description"
+    },
+    "frame": "task",
+    "background": "minecraft:gui/advancements/backgrounds/stone",
+    "announce_to_chat": false,
+    "show_toast": false
+  },
+  "requirements": [
+    [
+      "mini",
+      "nuke",
+      "tsar"
+    ]
+  ]
+}

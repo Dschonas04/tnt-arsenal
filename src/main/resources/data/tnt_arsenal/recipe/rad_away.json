@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:glass_bottle",
+    "minecraft:ghast_tear",
+    "minecraft:sugar",
+    "minecraft:dried_kelp"
+  ],
+  "result": {
+    "id": "tnt_arsenal:rad_away",
+    "count": 1
+  }
+}

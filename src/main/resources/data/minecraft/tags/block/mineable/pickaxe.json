@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "tnt_arsenal:trinitite"
+    "tnt_arsenal:trinitite",
+    "tnt_arsenal:lead_block",
+    "tnt_arsenal:siren",
+    "tnt_arsenal:bunker_door"
   ]
 }

@@ -1,8 +1,9 @@
 package io.github.dschonas04.tntarsenal.nuclear.block;
 
-import com.mojang.serialization.MapCodec;
+import io.github.dschonas04.tntarsenal.nuclear.alarm.Siren;
 import io.github.dschonas04.tntarsenal.nuclear.config.NukeConfig;
 import io.github.dschonas04.tntarsenal.nuclear.entity.PrimedNuke;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -56,6 +57,7 @@ public class NukeBlock extends TntBlock {
         PrimedNuke nuke = PrimedNuke.create(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, this, igniter, fuse);
         level.addFreshEntity(nuke);
         level.playSound(null, nuke.getX(), nuke.getY(), nuke.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 0.6f);
+        if (fuse > 20) Siren.warn((ServerLevel) level, nuke.position(), fuse);
         level.gameEvent(igniter, GameEvent.PRIME_FUSE, pos);
         level.removeBlock(pos, false);
         return true;

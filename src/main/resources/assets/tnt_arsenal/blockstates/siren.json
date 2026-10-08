@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "tnt_arsenal:block/siren"
+    },
+    "powered=true": {
+      "model": "tnt_arsenal:block/siren"
+    }
+  }
+}

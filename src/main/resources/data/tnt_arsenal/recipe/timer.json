@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "minecraft:clock",
+    "minecraft:redstone",
+    "minecraft:iron_ingot",
+    "minecraft:string"
+  ],
+  "result": {
+    "id": "tnt_arsenal:timer",
+    "count": 1
+  }
+}

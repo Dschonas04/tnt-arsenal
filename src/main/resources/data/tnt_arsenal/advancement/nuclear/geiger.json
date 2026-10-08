@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "geiger": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "tnt_arsenal:geiger_counter"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:geiger_counter"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.geiger.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.geiger.description"
+    },
+    "frame": "task"
+  },
+  "parent": "tnt_arsenal:nuclear/root"
+}

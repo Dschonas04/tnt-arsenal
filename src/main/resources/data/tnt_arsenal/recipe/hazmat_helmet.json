@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "LYL",
+    "LGL"
+  ],
+  "key": {
+    "L": "minecraft:leather",
+    "Y": "minecraft:yellow_dye",
+    "G": "minecraft:glass_pane"
+  },
+  "result": {
+    "id": "tnt_arsenal:hazmat_helmet",
+    "count": 1
+  }
+}

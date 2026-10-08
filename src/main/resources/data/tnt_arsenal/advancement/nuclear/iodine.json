@@ -1,0 +1,25 @@
+{
+  "criteria": {
+    "eat": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": "tnt_arsenal:iodine_tablets"
+        }
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "tnt_arsenal:iodine_tablets"
+    },
+    "title": {
+      "translate": "advancements.tnt_arsenal.nuclear.iodine.title"
+    },
+    "description": {
+      "translate": "advancements.tnt_arsenal.nuclear.iodine.description"
+    },
+    "frame": "task"
+  },
+  "parent": "tnt_arsenal:nuclear/geiger"
+}

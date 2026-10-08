@@ -10,6 +10,10 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.fabricmc.loader.api.FabricLoader;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Settings in {@code config/tnt_arsenal-nuclear.json}. Missing entries keep their
@@ -86,10 +90,59 @@ public final class NukeConfig {
                 NuclearTnt.LOG.error("Could not read {}, using defaults", file, e);
             }
         }
+        save();
+    }
+
+    /** Writes the current settings back, so the file lists every key with its value. */
+    public static void save() {
+        Path file = FabricLoader.getInstance().getConfigDir().resolve("tnt_arsenal-nuclear.json");
         try (Writer writer = Files.newBufferedWriter(file)) {
             GSON.toJson(current, writer);
         } catch (IOException e) {
             NuclearTnt.LOG.warn("Could not write {}", file, e);
         }
+    }
+
+    /** The settings by name, as {@code /nuclear config} lists them. */
+    public static Map<String, Object> values() {
+        Map<String, Object> out = new TreeMap<>();
+        for (Field field : NukeConfig.class.getFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
+            try {
+                out.put(field.getName(), field.get(current));
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * Sets one setting from text and saves the file. Returns null on success,
+     * otherwise what was wrong. Takes effect for the next bomb.
+     */
+    public static String set(String name, String text) {
+        Field field;
+        try {
+            field = NukeConfig.class.getField(name);
+        } catch (NoSuchFieldException e) {
+            return "unknown setting";
+        }
+        if (Modifier.isStatic(field.getModifiers())) return "unknown setting";
+        try {
+            Class<?> type = field.getType();
+            if (type == int.class) field.setInt(current, Integer.parseInt(text));
+            else if (type == long.class) field.setLong(current, Long.parseLong(text));
+            else if (type == float.class) field.setFloat(current, Float.parseFloat(text));
+            else if (type == double.class) field.setDouble(current, Double.parseDouble(text));
+            else if (type == boolean.class) field.setBoolean(current, Boolean.parseBoolean(text));
+            else return "cannot be set here";
+        } catch (NumberFormatException e) {
+            return "not a number";
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+        save();
+        return null;
     }
 }
