@@ -80,6 +80,11 @@ public final class Fallout implements Jobs.Job {
     }
 
     @Override
+    public boolean heavy() {
+        return true;
+    }
+
+    @Override
     public boolean tick() {
         if (delay-- > 0) return false;
         long start = System.nanoTime();

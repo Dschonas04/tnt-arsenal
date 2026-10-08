@@ -6,6 +6,15 @@ All notable changes to TNT Arsenal. The format follows
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-08
+
+### Fixed
+- The nuclear bombs no longer destroy chests, other blocks with contents or
+  obsidian-hard blocks in their core, as TNT Arsenal promises for every kind.
+- At most two nuclear explosions or fallouts work per dimension at a time;
+  further ones wait their turn. Before, a row of bombs lit together could
+  freeze the server.
+
 ## [1.3.0] - 2026-10-08
 
 ### Added

@@ -35,8 +35,9 @@ import net.minecraft.world.phys.Vec3;
  * the crater comes out a little flatter than a ball.
  *
  * <ul>
- * <li><b>core</b> (under 0.55 R): everything goes except bedrock and other unbreakables;</li>
- * <li><b>crater</b> (up to 0.8 R): everything goes except obsidian-hard blocks;</li>
+ * <li><b>core</b> (under 0.55 R) and <b>crater</b> (up to 0.8 R): everything goes
+ *     except what TNT Arsenal never touches: bedrock and other unbreakables,
+ *     obsidian-hard blocks and blocks with contents such as chests;</li>
  * <li><b>rim</b> (up to R): a ragged edge — the further in, the more is torn out; what
  *     stays is charred: grass and dirt turn to coarse dirt, logs to charred logs,
  *     leaves and plants burn away;</li>
@@ -96,6 +97,11 @@ public final class NukeExplosion implements Jobs.Job {
     }
 
     @Override
+    public boolean heavy() {
+        return true;
+    }
+
+    @Override
     public boolean tick() {
         long until = System.nanoTime() + TICK_BUDGET_NANOS;
         int budget = NukeConfig.get().blocksPerTick;
@@ -150,11 +156,10 @@ public final class NukeExplosion implements Jobs.Job {
         if (state.isAir()) return false;
         double stretch = dy < 0 ? dy * DEPTH : dy;
         double e = Math.sqrt(dx * dx + dz * dz + stretch * stretch) / radius;
-        boolean unbreakable = state.getDestroySpeed(level, pos) < 0;
-        if (e < CORE) {
-            return !unbreakable && vaporise(pos);
-        }
-        boolean hard = unbreakable || state.getBlock().getExplosionResistance() >= 600;
+        // Chests, furnaces and the like keep their contents; so does every other
+        // block with a block entity.
+        if (state.hasBlockEntity()) return false;
+        boolean hard = state.getDestroySpeed(level, pos) < 0 || state.getBlock().getExplosionResistance() >= 600;
         if (e < CRATER) {
             return !hard && vaporise(pos);
         }
