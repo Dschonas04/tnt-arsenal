@@ -1,9 +1,15 @@
 // Minecraft 26.2 ships with readable class names, so this mod is compiled straight
-// against the server jar — no mappings, no remapping step, plain Gradle.
+// against the game jars — no mappings, no Loom, plain Gradle.
 //
-//   gradle build -Pminecraft_jar=/path/to/server-26.2.jar
+//   libs/server.jar   the dedicated server jar (common code is checked against it)
+//   libs/client.jar   the client jar (only the client source set sees it)
+//   libs/mc/          the libraries listed in the 26.2 version manifest
+//   libs/fabric/      the modules nested in the fabric-api jar (META-INF/jars/)
 //
-// The jar it produces goes into the mods directory as it is.
+// tools/fetch-libs.sh fills libs/. Common code that touches a client class does not
+// compile: the source sets keep client and server apart the same way Loom's
+// splitEnvironmentSourceSets() does. The jar it produces goes into the mods
+// directory as it is.
 plugins {
     id 'java'
 }
@@ -14,25 +20,30 @@ group = project.maven_group
 repositories {
     mavenCentral()
     maven { name = 'Fabric'; url = 'https://maven.fabricmc.net/' }
-    maven { name = 'Minecraft libraries'; url = 'https://libraries.minecraft.net' }
 }
 
-def minecraftJar = file(project.findProperty('minecraft_jar') ?: 'libs/server.jar')
+sourceSets {
+    client {
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+    }
+}
+
+def gameLibraries = fileTree(dir: 'libs/mc', include: '*.jar')
+def fabricApi = fileTree(dir: 'libs/fabric', include: '*.jar')
 
 dependencies {
-    compileOnly files(minecraftJar)
-    // Two Fabric API modules, extracted from the fabric-api jar into libs/: the
-    // creative tab events and the event base they build on.
-    compileOnly fileTree(dir: 'libs', include: 'fabric-*.jar')
+    compileOnly files('libs/server.jar')
+    compileOnly gameLibraries
+    compileOnly fabricApi
     compileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
     compileOnly "net.fabricmc:sponge-mixin:${project.mixin_version}"
-    compileOnly "org.slf4j:slf4j-api:2.0.16"
-    // Minecraft's own classes carry JSpecify annotations, and their signatures reach into
-    // these libraries, so javac needs them on the path even though we never call them.
-    compileOnly "org.jspecify:jspecify:1.0.0"
-    compileOnly "it.unimi.dsi:fastutil:${project.fastutil_version}"
-    compileOnly "com.mojang:datafixerupper:${project.datafixerupper_version}"
-    compileOnly "com.mojang:brigadier:1.3.10"
+
+    clientCompileOnly files('libs/client.jar')
+    clientCompileOnly gameLibraries
+    clientCompileOnly fabricApi
+    clientCompileOnly "net.fabricmc:fabric-loader:${project.loader_version}"
+    clientCompileOnly "net.fabricmc:sponge-mixin:${project.mixin_version}"
 }
 
 java {
@@ -41,12 +52,14 @@ java {
     withSourcesJar()
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 tasks.named('compileJava') {
     doFirst {
-        if (!minecraftJar.exists()) {
-            throw new GradleException("Minecraft jar not found at ${minecraftJar}. " +
-                    "Pass -Pminecraft_jar=/path/to/server-<version>.jar, " +
-                    "or drop the jar into libs/server.jar")
+        if (!file('libs/server.jar').exists()) {
+            throw new GradleException("libs/server.jar not found. Run tools/fetch-libs.sh first.")
         }
     }
 }
@@ -60,9 +73,9 @@ processResources {
 
 jar {
     archiveBaseName = project.archives_base_name
-    from('LICENSE') { rename { "${it}_${project.archives_base_name}" } }
-    manifest {
-        attributes 'Implementation-Title': 'TNT Arsenal',
-                   'Implementation-Version': project.version
-    }
+    from sourceSets.client.output
+}
+
+sourcesJar {
+    from sourceSets.client.allSource
 }

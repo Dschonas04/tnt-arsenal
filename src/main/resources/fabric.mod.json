@@ -3,7 +3,7 @@
   "id": "tnt_arsenal",
   "version": "${version}",
   "name": "TNT Arsenal",
-  "description": "Sixty kinds of TNT, each with its own hand-drawn look and its own way of going off: a nuke with fallout, earthquakes that tear fissures down to bedrock, volcanoes, black holes, meteors, drills, tunnels, spiral staircases, bunkers, towers, bridges, x-ray, harvesters, lumberjacks, wolf packs and more. Bedrock, obsidian and chests are never touched. Crafted at the table, so JEI and REI show every recipe.",
+  "description": "Sixty kinds of TNT, each with its own hand-drawn look and its own way of going off: earthquakes that tear fissures down to bedrock, volcanoes, black holes, meteors, drills, tunnels, spiral staircases, bunkers, towers, bridges, x-ray, harvesters, lumberjacks, wolf packs and more. Plus a nuclear arsenal: mini nuke, nuke and tsar bomba with a remote detonator, a mushroom cloud, radiation in chunks and players, fallout, contaminated water and a Geiger counter. Bedrock, obsidian and chests are never touched. Crafted at the table, so JEI and REI show every recipe.",
   "authors": [
     "Dschonas04"
   ],
@@ -17,11 +17,16 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "io.github.dschonas04.tntarsenal.TntArsenal"
+      "io.github.dschonas04.tntarsenal.TntArsenal",
+      "io.github.dschonas04.tntarsenal.nuclear.NuclearTnt"
+    ],
+    "client": [
+      "io.github.dschonas04.tntarsenal.nuclear.client.NuclearTntClient"
     ]
   },
   "mixins": [
-    "tnt_arsenal.mixins.json"
+    "tnt_arsenal.mixins.json",
+    "tnt_arsenal.nuclear.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.19.0",

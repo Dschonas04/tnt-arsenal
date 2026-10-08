@@ -15,6 +15,7 @@ import json
 import os
 import random
 import struct
+import sys
 import zlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -743,6 +744,11 @@ def main():
         text(sheet, w, tx, cy + 136, name, grey)
     write_png(os.path.join(REPO, "docs", "textures.png"), w, h, sheet)
     print("ok", len(K), "kinds")
+    # The nuclear part: bombs, detonator, Geiger counter, contamination. Runs last
+    # because it adds its translations to the files written above.
+    sys.path.insert(0, HERE)
+    import nuclear_assets
+    nuclear_assets.main()
 
 
 if __name__ == "__main__":

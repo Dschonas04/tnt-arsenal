@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "tnt_arsenal:nuke",
+    "tnt_arsenal:nuke",
+    "tnt_arsenal:nuke",
+    "tnt_arsenal:nuke",
+    "minecraft:nether_star",
+    "minecraft:netherite_ingot"
+  ],
+  "result": {
+    "id": "tnt_arsenal:tsar_bomba",
+    "count": 1
+  }
+}

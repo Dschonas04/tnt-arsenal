@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/snow_height2",
+  "textures": {
+    "texture": "tnt_arsenal:block/fallout",
+    "particle": "tnt_arsenal:block/fallout"
+  }
+}

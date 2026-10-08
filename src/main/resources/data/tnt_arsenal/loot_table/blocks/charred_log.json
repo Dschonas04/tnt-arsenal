@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:charcoal"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "tnt_arsenal:blocks/charred_log"
+}

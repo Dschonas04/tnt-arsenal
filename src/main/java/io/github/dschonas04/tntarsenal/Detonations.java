@@ -10,6 +10,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import io.github.dschonas04.tntarsenal.nuclear.block.Tier;
+import io.github.dschonas04.tntarsenal.nuclear.config.NukeConfig;
+import io.github.dschonas04.tntarsenal.nuclear.radiation.Radiation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -1356,6 +1359,9 @@ final class Detonations {
      * it — faster the closer they are. Milk helps for a moment; leaving helps.
      */
     private static void fallout(ServerLevel level, Vec3 c) {
+        // The same lasting radiation the nuclear bombs leave, so a Geiger counter
+        // reads this crater too, long after the five minutes below are over.
+        Radiation.contaminate(level, BlockPos.containing(c), 55, NukeConfig.get().peakRate(Tier.NUKE));
         DustParticleOptions glow = new DustParticleOptions(0x7CFF3A, 1.6f);
         RandomSource random = level.getRandom();
         Tasks.start(age -> {

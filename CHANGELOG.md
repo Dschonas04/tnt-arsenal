@@ -6,6 +6,24 @@ All notable changes to TNT Arsenal. The format follows
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-08
+
+### Added
+- The nuclear arsenal, formerly the separate mod Nuclear TNT, is now part of
+  TNT Arsenal: mini nuke, nuke and tsar bomba with a tick-spread explosion,
+  remote detonator, flash, shaking ground and mushroom cloud, radiation in
+  chunks and players, fallout, irradiated earth, trinitite, contaminated
+  water, green fog and the commands under `/nuclear`.
+- Geiger counter: shows the dose rate and your dose above the hotbar and
+  ticks faster the hotter it gets.
+- The nuke from the sixty kinds leaves lasting radiation in its chunks, so
+  the Geiger counter reads its crater too.
+
+### Changed
+- The mod now has client code (flash, mushroom cloud, green fog), and the
+  build compiles against the client jar as well; `tools/fetch-libs.sh`
+  fetches it with the game's libraries and all Fabric API modules.
+
 ## [1.2.2] - 2026-10-05
 
 ### Fixed
