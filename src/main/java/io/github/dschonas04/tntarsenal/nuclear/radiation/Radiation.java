@@ -114,6 +114,31 @@ public final class Radiation {
         chunk.markUnsaved();
     }
 
+    /**
+     * Removes all radiation within {@code radius} blocks of a position: every chunk
+     * there is loaded and set to zero, and blasts that went off there are forgotten
+     * so that nothing comes back when a chunk loads later. Returns the chunks cleared.
+     */
+    public static int clear(ServerLevel level, BlockPos center, int radius) {
+        long now = level.getGameTime();
+        List<Blast> blasts = new ArrayList<>(at(level).getAttachedOrElse(BLASTS, List.of()));
+        long r2 = (long) radius * radius;
+        if (blasts.removeIf(b -> b.center().distSqr(center) <= r2)) at(level).setAttached(BLASTS, List.copyOf(blasts));
+        int cleared = 0;
+        for (int cx = (center.getX() - radius) >> 4; cx <= (center.getX() + radius) >> 4; cx++) {
+            for (int cz = (center.getZ() - radius) >> 4; cz <= (center.getZ() + radius) >> 4; cz++) {
+                LevelChunk chunk = level.getChunk(cx, cz);
+                ChunkRadiation old = at(chunk).getAttached(CHUNK);
+                if (old == null || old.at(now, halfLife()) <= 0f) continue;
+                // zero as of now, so that catchUp does not replay older blasts
+                at(chunk).setAttached(CHUNK, new ChunkRadiation(0f, now));
+                chunk.markUnsaved();
+                cleared++;
+            }
+        }
+        return cleared;
+    }
+
     /** A chunk that was unloaded during a blast gets that blast's radiation now, decayed by the time since. */
     private static void catchUp(ServerLevel level, LevelChunk chunk) {
         List<Blast> blasts = at(level).getAttached(BLASTS);

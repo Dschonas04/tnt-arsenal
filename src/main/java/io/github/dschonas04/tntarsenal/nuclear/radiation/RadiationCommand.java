@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 /**
  * {@code /nuclear radiation <pos>} shows the dose rate of a chunk,
  * {@code /nuclear dose <player> [set <mSv>]} shows or sets a player's dose.
+ * {@code /nuclear clear <radius>} removes all radiation around the caller.
  * {@code /nuclear count <block> <radius>} counts a block around the caller, 40 blocks up and down.
  * {@code /nuclear config [key value]} lists or changes a setting and saves it.
  * For operators.
@@ -66,6 +67,13 @@ public final class RadiationCommand {
                                     c.getSource().sendSuccess(() -> Component.literal(key + " = " + NukeConfig.values().get(key)), true);
                                     return 1;
                                 }))))
+                        .then(Commands.literal("clear").then(Commands.argument("radius", IntegerArgumentType.integer(1, 256)).executes(c -> {
+                            ServerLevel level = c.getSource().getLevel();
+                            int radius = IntegerArgumentType.getInteger(c, "radius");
+                            int chunks = Radiation.clear(level, BlockPos.containing(c.getSource().getPosition()), radius);
+                            c.getSource().sendSuccess(() -> Component.literal("Radiation cleared in " + chunks + " chunks"), true);
+                            return chunks;
+                        })))
                         .then(Commands.literal("radiation").then(Commands.argument("pos", BlockPosArgument.blockPos()).executes(c -> {
                             ServerLevel level = c.getSource().getLevel();
                             BlockPos pos = BlockPosArgument.getLoadedBlockPos(c, "pos");

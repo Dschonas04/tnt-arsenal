@@ -137,7 +137,7 @@ called *TNT Arsenal: Nuclear*:
   Become Death*.
 
 `/nuclear radiation <pos>`, `/nuclear dose <player> [set <mSv>]`,
-`/nuclear count <block> <radius>` and `/nuclear config [key value]` are for
+`/nuclear count <block> <radius>`, `/nuclear clear <radius>` and `/nuclear config [key value]` are for
 operators; the last one lists or changes a setting and saves it to
 `config/tnt_arsenal-nuclear.json`.
 

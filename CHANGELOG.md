@@ -6,6 +6,12 @@ All notable changes to TNT Arsenal. The format follows
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-10-08
+
+### Added
+- `/nuclear clear <radius>` removes all radiation around the caller, including
+  blasts that would otherwise come back when a chunk loads.
+
 ## [1.4.0] - 2026-10-08
 
 ### Added
